@@ -1,73 +1,101 @@
-<!-- SplitSignupProvidersOnly_FullLeftImage.vue -->
 <template>
   <main class="split-signup min-vh-100 d-flex align-items-stretch">
     <div class="container-fluid px-0">
-      <div class="row gx-0">
-        <!-- LEFT: full-bleed image with centered H3 overlay -->
-        <aside class="col-12 col-lg-6 left-image-panel">
-          <div class="left-image-wrapper" aria-hidden="false">
-            <img src="../assets/img/main2.jpg" alt="illustration" class="left-image" />
-            <!-- centered text over the image -->
-            <div class="left-overlay-text">
-              <h1>Create your account
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-              </h1>
-            </div>
-          </div>
-        </aside>
+      <div class="row gx-0 justify-content-center">
 
-        <!-- RIGHT: provider buttons only (no form) -->
-        <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-          <div class="right-inner w-100 d-flex flex-column" style="max-width:520px; min-height:72vh;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h4 class="mb-0">Sign up for TestMyPlan</h4>
-                <small class="text-muted">Choose a provider to continue</small>
+        <!-- CENTERED CARD -->
+        <div class="col-12 col-xl-10">
+          <div class="card-shell d-flex overflow-hidden shadow-soft rounded-4">
+
+            <!-- LEFT: full-bleed image with centered H3 overlay -->
+            <aside class="col-12 col-lg-6 left-image-panel">
+              <div class="" aria-hidden="false">
+                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
+                <!-- <div class="left-gradient"></div> -->
+                <div class="left-overlay-text">
+                  <h1 class="overlay-title ">Create your account</h1>
+                  <p class="overlay-sub">Join TestMyPlan — collaborate faster, ship safer.</p>
+                </div>
               </div>
+            </aside>
 
-              <a class="small text-muted" href="#" @click.prevent="goToSignin">Sign in →</a>
-            </div>
+            <!-- RIGHT: provider buttons -->
+            <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
+              <div class="right-inner w-100 d-flex flex-column" style="max-width:520px; min-height:72vh;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h4 class="title mb-0">Sign up for TestMyPlan</h4>
+                    <small class="text-muted">Choose a provider to continue</small>
+                  </div>
 
-            <!-- Buttons block (centered vertically) -->
-            <div class="d-grid gap-3 my-3 align-self-stretch" style="align-content:center;">
-              <!-- Slack -->
-              <button class="btn btn-outline-primary d-flex align-items-center gap-3 provider-btn"
-                @click="signup('slack')" aria-label="Sign up with Slack">
-                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/slack.svg" alt="slack"
-                  style="height:18px" />
-                Sign up with Slack
-              </button>
+                  <a class="small text-muted signin-link" href="#" @click.prevent="goToSignin">Sign in →</a>
+                </div>
 
-              <!-- Jira -->
-              <button class="btn btn-outline-primary d-flex align-items-center gap-3 provider-btn"
-                @click="signup('jira')" aria-label="Sign up with Jira">
-                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/atlassian.svg" alt="jira"
-                  style="height:18px" />
-                Sign up with Jira
-              </button>
+                <div class="providers-block my-3 align-self-stretch">
 
-              <!-- Teams -->
-              <button class="btn btn-outline-primary d-flex align-items-center gap-3 provider-btn"
-                @click="signup('teams')" aria-label="Sign up with Teams">
-                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/microsoftteams.svg" alt="teams"
-                  style="height:18px" />
-                Sign up with Teams
-              </button>
+                  <!-- Slack -->
+                  <button class="provider-btn shadow-sm d-flex align-items-center gap-3" @click="signup('slack')"
+                    aria-label="Sign up with Slack">
+                    <span class="icon-pill">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/slack.svg" alt="slack" />
+                    </span>
+                    <div class="provider-labels">
+                      <div class="main">Sign up with Slack</div>
+                      <div class="sub">Use your Slack workspace</div>
+                    </div>
+                    <span class="chev">›</span>
+                  </button>
 
-              <!-- Email (navigates to next page) -->
-              <button class="btn btn-outline-primary provider-btn" @click="goToEmail" aria-label="Sign up with Email">
-                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/gmail.svg" alt="email"
-                  style="height:18px" />
-                Sign up with Email
-              </button>
-            </div>
+                  <!-- Jira -->
+                  <button class="provider-btn shadow-sm d-flex align-items-center gap-3" @click="signup('jira')"
+                    aria-label="Sign up with Jira">
+                    <span class="icon-pill">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/atlassian.svg" alt="jira" />
+                    </span>
+                    <div class="provider-labels">
+                      <div class="main">Sign up with Jira</div>
+                      <div class="sub">Connect your Atlassian account</div>
+                    </div>
+                    <span class="chev">›</span>
+                  </button>
 
-            <!-- small legal / note pinned to bottom of the right column -->
-            <p class="small text-muted ">
-              By continuing you agree to our <a href="#" class="text-decoration-underline">Terms</a>.
-            </p>
+                  <!-- Teams -->
+                  <button class="provider-btn shadow-sm d-flex align-items-center gap-3" @click="signup('teams')"
+                    aria-label="Sign up with Teams">
+                    <span class="icon-pill">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/microsoftteams.svg" alt="teams" />
+                    </span>
+                    <div class="provider-labels">
+                      <div class="main">Sign up with Teams</div>
+                      <div class="sub">Use Microsoft Teams for SSO</div>
+                    </div>
+                    <span class="chev">›</span>
+                  </button>
+
+                  <!-- Email -->
+                  <button class="provider-btn shadow-sm d-flex align-items-center gap-3" @click="goToEmail"
+                    aria-label="Sign up with Email">
+                    <span class="icon-pill">
+                      <img src="https://cdn.jsdelivr.net/npm/simple-icons@v8/icons/gmail.svg" alt="email" />
+                    </span>
+                    <div class="provider-labels">
+                      <div class="main">I dont have any of these</div>
+                      <div class="sub">Use any email address</div>
+                    </div>
+                    <span class="chev">›</span>
+                  </button>
+
+                </div>
+
+                <p class="small text-muted mt-auto mb-0">
+                  By continuing you agree to our <a href="#" class="text-decoration-underline">Terms</a>.
+                </p>
+              </div>
+            </section>
+
           </div>
-        </section>
+        </div>
+
       </div>
     </div>
   </main>
@@ -77,31 +105,18 @@
 export default {
   name: "SplitSignupProvidersOnly_FullLeftImage",
   methods: {
-    /**
-     * Called when user clicks Slack / Jira / Teams.
-     * Navigates to /teams-info and attaches ?provider=<provider>
-     */
     signup(provider: string) {
-      // analytics hook (optional)
-      console.log("start provider signup:", provider);
-
-      // prefer Vue router if available
+      // Navigate to onboarding page with provider
       if (this.$router) {
-        this.$router.push({ path: "/teams-info", query: { provider } });
+        this.$router.push({ path: "/onboarding", query: { provider } });
         return;
       }
-
-      // fallback
-      const url = `/teams-info?provider=${encodeURIComponent(provider)}`;
-      window.location.href = url;
+      window.location.href = `/onboarding?provider=${provider}`;
     },
 
-    /**
-     * Email button -> /signup-email
-     */
     goToEmail() {
       if (this.$router) {
-        this.$router.push({ path: "/signup-email" });
+        this.$router.push("/signup-email");
         return;
       }
       window.location.href = "/signup-email";
@@ -109,7 +124,7 @@ export default {
 
     goToSignin() {
       if (this.$router) {
-        this.$router.push({ path: "/login" });
+        this.$router.push("/login");
         return;
       }
       window.location.href = "/login";
@@ -119,122 +134,145 @@ export default {
 </script>
 
 <style scoped>
-/* reset container gaps */
+/* Page background */
 .split-signup {
-  background: #fff;
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+  padding: 48px 16px;
 }
 
-/* LEFT: full-bleed image panel */
+/* card shell */
+.card-shell {
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.88));
+  box-shadow: 0 8px 30px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(11, 42, 102, 0.06);
+}
+
+/* LEFT IMAGE PANEL */
 .left-image-panel {
   position: relative;
   padding: 0;
-  /* remove default padding */
-  min-height: 100vh;
+  min-height: 520px;
   overflow: hidden;
-  display: block;
 }
 
-/* wrapper ensures position context */
-.left-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-/* image covers the whole left panel */
 .left-image {
-  position: absolute;
-  inset: 0;
-  /* top:0; right:0; bottom:0; left:0 */
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* fill, cropping if needed */
-  display: block;
-  /* remove border radius so image touches edges */
-  border-radius: 0;
+  filter: saturate(1.05) contrast(0.98);
 }
 
-/* centered overlay text */
+/* .left-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(1, 24, 39, 0.45), rgba(1, 24, 39, 0.12), rgba(1, 24, 39, 0.02));
+} */
+
 .left-overlay-text {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  flex-direction: column;
   text-align: center;
-  pointer-events: none;
-  /* allow clicks through if necessary */
+  padding: 40px;
+  z-index: 3;
+  color: #fff;
 }
 
-/* style for the h3 — tuned to be visible over image */
-.left-overlay-text h1 {
-  color: #ffffff;
-  font-size: 2rem;
+.overlay-title {
+  font-size: 2.1rem;
   font-weight: 700;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   margin: 0;
-  padding: 0 18px;
-  line-height: 1.1;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
-/* RIGHT panel */
+.overlay-sub {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* RIGHT PANEL */
 .right-panel {
-  background: #fff;
-  min-height: 100vh;
   padding-left: 48px;
   padding-right: 48px;
+  background: #ffffff;
+}
+
+/* title color updated */
+.title {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #03318d;
+}
+
+.providers-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.provider-btn {
+  background: #fff;
+  border: 1px solid rgba(11, 42, 102, 0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: 0.2s ease;
+}
+
+.provider-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 34px rgba(9, 30, 66, 0.08);
+}
+
+/* icon pill */
+.icon-pill {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #f5f7fa, #ebf1f9);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* buttons & look */
-.provider-btn {
-  padding: 12px 16px;
+/* ⭐ EXACT BLUE COLOR FOR ICONS (#03318d) */
+.icon-pill img {
+  width: 18px;
+  height: 18px;
+
+  /* exact deep blue filter for #03318d */
+  filter: brightness(0) saturate(100%) invert(10%) sepia(90%) saturate(3000%) hue-rotate(205deg) brightness(80%) contrast(105%);
+}
+
+
+.provider-labels .main {
   font-weight: 600;
-  border-radius: 8px;
-  text-align: left;
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  white-space: nowrap;
+  color: #03318d;
+  /* SAME exact blue */
 }
 
-/* variants */
-.btn-outline-primary {
-  color: #0f0f0f;
-  border-color: rgba(11, 42, 102, 0.12);
-  background: #fff;
+
+.provider-labels .sub {
+  font-size: 12px;
+  color: #687388;
 }
 
-.btn-outline-secondary {
-  background: #fff;
-  border: 1px solid #e6e9ec;
-  color: #111;
+.chev {
+  font-size: 22px;
+  color: rgba(11, 42, 102, 0.18);
 }
 
-.btn-dark {
-  background: #111;
-  color: #fff;
-  border: none;
-}
-
-/* responsive */
 @media (max-width: 991.98px) {
-  .left-image-panel {
-    min-height: 40vh;
-  }
-
-  .left-overlay-text h3 {
-    font-size: 1.5rem;
-  }
-
-  .right-inner {
-    min-height: 50vh;
-    padding-left: 24px;
-    padding-right: 24px;
+  .card-shell {
+    flex-direction: column-reverse;
   }
 }
 </style>

@@ -4,7 +4,7 @@ import SignupView from '@/views/SignupView.vue'
 import LoginView from '@/views/LoginView.vue'
 import EmailAuthView from '@/views/EmailAuthView.vue'
 import ForgetPasswordView from '@/views/ForgetPasswordView.vue'
-import SignupEmailView from '@/views/signupEmailView.vue'
+import SignupEmailView from '@/views/SignupEmailView.vue'
 import OnboardingFormView from '@/views/OnboardingFormView.vue'
 
 const router = createRouter({

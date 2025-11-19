@@ -1,106 +1,117 @@
 <template>
   <main class="split-signup min-vh-100 d-flex align-items-stretch">
     <div class="container-fluid px-0">
-      <div class="row gx-0">
-        <!-- LEFT: full-bleed image (keeps theme) -->
-        <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
-          <div class="left-image-wrapper">
-            <img src="../assets/img/main2.jpg" alt="illustration" class="left-image" />
-            <div class="left-overlay-text">
-              <h1>Create your account <p class="overlay-sub">Join TestMyPlan — secure, private, and easy.</p>
-              </h1>
-            </div>
-          </div>
-        </aside>
+      <div class="row gx-0 justify-content-center">
 
-        <!-- RIGHT: email signup form -->
-        <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-          <div class="right-inner w-100" style="max-width:520px; min-height:72vh;">
-            <div class="mb-3">
-              <h4 class="mb-0">Sign up with Email</h4>
-              <small class="text-muted">Complete the details below to create your account</small>
-            </div>
+        <!-- CENTERED CARD -->
+        <div class="col-12 col-xl-10">
+          <div class="card-shell d-flex overflow-hidden rounded-4">
 
-            <form @submit.prevent="onSubmit" novalidate :class="{ 'was-validated': tried }">
-              <!-- Name -->
-              <div class="mb-3">
-                <label class="form-label small mb-1">Name</label>
-                <input v-model.trim="form.name"
-                  :class="['form-control', 'form-control-sm', { 'is-invalid': nameError }]" type="text"
-                  placeholder="Full name" required />
-                <div class="invalid-feedback small">{{ nameError }}</div>
-              </div>
+            <!-- LEFT: full-bleed image (Theme A) -->
+            <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
+              <div class="left-image-wrapper">
+                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
+                <div class="left-gradient"></div>
 
-              <!-- Email -->
-              <div class="mb-3">
-                <label class="form-label small mb-1">Email address</label>
-                <input v-model.trim="form.email"
-                  :class="['form-control', 'form-control-sm', { 'is-invalid': emailError }]" type="email"
-                  placeholder="you@example.com" required />
-                <div class="invalid-feedback small">{{ emailError }}</div>
-              </div>
-
-              <!-- Password -->
-              <div class="mb-3">
-                <label class="form-label small mb-1">Password</label>
-                <div class="input-group input-group-sm">
-                  <input v-model="form.password" :class="['form-control', { 'is-invalid': passwordError }]"
-                    :type="showPassword ? 'text' : 'password'" placeholder="Enter a password (min 8 characters)"
-                    required />
-                  <button class="btn btn-outline-secondary btn-sm btn-icon" type="button" @click="toggleShowPassword"
-                    :aria-pressed="String(showPassword)" :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                    title="Toggle password visibility">
-                    <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                  </button>
+                <div class="left-overlay-text">
+                  <h1 class="overlay-title">Signup</h1>
+                  <p class="overlay-sub">Join TestMyPlan — secure, private, and easy.</p>
                 </div>
-                <div class="invalid-feedback small">{{ passwordError }}</div>
-                <div class="form-text small text-muted">Use at least 8 characters.</div>
               </div>
+            </aside>
 
-              <!-- Confirm Password -->
-              <div class="mb-3">
-                <label class="form-label small mb-1">Confirm Password</label>
-                <div class="input-group input-group-sm">
-                  <input v-model="form.confirmPassword"
-                    :class="['form-control', 'form-control-sm', { 'is-invalid': confirmError }]"
-                    :type="showPassword ? 'text' : 'password'" placeholder="Re-enter password" required />
-                  <!-- same eye icon here so either button toggles both fields -->
-                  <button class="btn btn-outline-secondary btn-sm btn-icon" type="button" @click="toggleShowPassword"
-                    :aria-pressed="String(showPassword)" :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                    title="Toggle password visibility">
-                    <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                  </button>
+            <!-- RIGHT: email signup form (Theme A panel) -->
+            <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
+              <!-- inner card area to control width & spacing -->
+              <div class="right-card w-100" style="max-width: 520px; min-height:72vh;">
+                <div class="mb-3">
+                  <h4 class="title mb-0">Sign up with Email</h4>
+                  <small class="text-muted">Complete the details below to create your account</small>
                 </div>
-                <div class="invalid-feedback small">{{ confirmError }}</div>
-              </div>
 
-              <!-- Submit -->
-              <div class="d-grid mb-3">
-                <button class="btn btn-dark btn-md" :disabled="submitting">
-                  <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
-                    aria-hidden="true"></span>
-                  Create account
-                </button>
-              </div>
+                <form @submit.prevent="onSubmit" novalidate :class="{ 'was-validated': tried }">
+                  <!-- Name -->
+                  <div class="mb-3">
+                    <label class="form-label small mb-1">Name</label>
+                    <input v-model.trim="form.name"
+                      :class="['form-control', 'form-control-sm', { 'is-invalid': nameError }]" type="text"
+                      placeholder="Full name" required />
+                    <div class="invalid-feedback small">{{ nameError }}</div>
+                  </div>
 
-              <div v-if="message" :class="['small', messageClass]" role="status">{{ message }}</div>
+                  <!-- Email -->
+                  <div class="mb-3">
+                    <label class="form-label small mb-1">Email address</label>
+                    <input v-model.trim="form.email"
+                      :class="['form-control', 'form-control-sm', { 'is-invalid': emailError }]" type="email"
+                      placeholder="you@example.com" required />
+                    <div class="invalid-feedback small">{{ emailError }}</div>
+                  </div>
 
-              <div class="text-center mt-3 small">
-                <a href="#" @click.prevent="goToSignin">Already have an account? Sign in</a>
+                  <!-- Password -->
+                  <div class="mb-3">
+                    <label class="form-label small mb-1">Password</label>
+                    <div class="input-group input-group-sm">
+                      <input v-model="form.password" :class="['form-control', { 'is-invalid': passwordError }]"
+                        :type="showPassword ? 'text' : 'password'" placeholder="Enter a password (min 8 characters)"
+                        required />
+                      <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
+                        @click="toggleShowPassword" :aria-pressed="String(showPassword)"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                        title="Toggle password visibility">
+                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                      </button>
+                    </div>
+                    <div class="invalid-feedback small">{{ passwordError }}</div>
+                    <div class="form-text small text-muted">Use at least 8 characters.</div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div class="mb-3">
+                    <label class="form-label small mb-1">Confirm Password</label>
+                    <div class="input-group input-group-sm">
+                      <input v-model="form.confirmPassword"
+                        :class="['form-control', 'form-control-sm', { 'is-invalid': confirmError }]"
+                        :type="showPassword ? 'text' : 'password'" placeholder="Re-enter password" required />
+                      <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
+                        @click="toggleShowPassword" :aria-pressed="String(showPassword)"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                        title="Toggle password visibility">
+                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                      </button>
+                    </div>
+                    <div class="invalid-feedback small">{{ confirmError }}</div>
+                  </div>
+
+                  <!-- Submit -->
+                  <div class="d-grid mb-3">
+                    <button class="btn btn-dark btn-md" :disabled="submitting">
+                      <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
+                        aria-hidden="true"></span>
+                      Create account
+                    </button>
+                  </div>
+
+                  <div v-if="message" :class="['small', messageClass]" role="status">{{ message }}</div>
+
+                  <div class="text-center mt-3 small">
+                    <a href="#" @click.prevent="goToSignin">Already have an account? Sign in</a>
+                  </div>
+                </form>
               </div>
-            </form>
+            </section>
+
           </div>
-        </section>
+        </div>
+
       </div>
     </div>
   </main>
 </template>
 
 <script lang="ts">
-// import axios from "axios"; // uncomment and configure your endpoint as needed
-
 export default {
-  name: "SignUpEmailForm",
+  name: "SignUpEmailFormThemeA",
   data() {
     return {
       form: {
@@ -126,7 +137,6 @@ export default {
     },
 
     validate() {
-      // reset errors
       this.nameError = "";
       this.emailError = "";
       this.passwordError = "";
@@ -165,10 +175,6 @@ export default {
       return ok;
     },
 
-    /**
-     * onSubmit: validates, optionally calls your API, then navigates to /emailauth
-     * passing the email as a query param so the next screen can use it.
-     */
     async onSubmit() {
       this.tried = true;
       this.message = "";
@@ -182,36 +188,35 @@ export default {
           password: this.form.password
         };
 
-        // ======= Your real signup call goes here =======
-        // Example using axios:
+        // ======= PUT YOUR API CALL HERE =======
+        // Example:
         // const res = await axios.post('/api/auth/signup/email', payload);
-        // if the server returns error, throw or handle it accordingly
-        // ===============================================
+        // handle response or errors accordingly
+        // ======================================
 
-        // demo delay to simulate network - remove for production
+        // demo delay to simulate network
         await new Promise((r) => setTimeout(r, 800));
 
-        // show message (optional)
         this.message = "Account created — check your email for verification.";
         this.messageClass = "text-success";
 
-        // clear sensitive fields but keep email for navigation
+        // keep email for next step
+        const emailToSend = this.form.email;
+
+        // clear sensitive fields
         this.form.password = "";
         this.form.confirmPassword = "";
         this.tried = false;
         this.showPassword = false;
 
-        // navigate to /emailauth with email in query so next page can prefill / show instructions
-        const target = { path: "/emailauth", query: { email: this.form.email } };
-
-        if ((this as any).$router) {
-          (this as any).$router.push(target);
+        // navigate to email auth / instructions
+        const target = { path: "/emailauth", query: { email: emailToSend } };
+        if (this.$router) {
+          this.$router.push(target);
         } else {
-          const url = `/emailauth?email=${encodeURIComponent(this.form.email)}`;
-          window.location.href = url;
+          window.location.href = `/emailauth?email=${encodeURIComponent(emailToSend)}`;
         }
-      } catch (err: any) {
-        // you can customize error extraction from your API response
+      } catch (err) {
         this.message = err?.response?.data?.message || "Unable to create account. Try again.";
         this.messageClass = "text-danger";
       } finally {
@@ -220,42 +225,56 @@ export default {
     },
 
     goToSignin() {
-      if ((this as any).$router) {
-        (this as any).$router.push({ path: "/signin" });
-        return;
+      if (this.$router) {
+        this.$router.push("/login");
+      } else {
+        window.location.href = "/login";
       }
-      window.location.href = "/signin";
     }
   }
 };
 </script>
 
 <style scoped>
-/* Add this in your index.html head if not already included:
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-*/
+/* THEME A: card shell + left image + right panel styles */
 
-/* Reuse auth theme tokens from earlier pages */
+/* container background retained outside card if desired */
+.split-signup {
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+  padding: 32px 12px;
+}
+
+/* centered card shell */
+.card-shell {
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 12px 40px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(11, 42, 102, 0.06);
+}
+
+/* left image area */
 .left-image-panel {
   position: relative;
   padding: 0;
-  min-height: 100vh;
+  min-height: 520px;
   overflow: hidden;
 }
 
-.left-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
 .left-image {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: saturate(1.04) contrast(0.98);
+}
+
+.left-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(1, 24, 39, 0.45) 0%, rgba(1, 24, 39, 0.12) 40%, rgba(1, 24, 39, 0.02) 100%);
+  pointer-events: none;
 }
 
 .left-overlay-text {
@@ -264,89 +283,99 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  flex-direction: column;
   text-align: center;
-  pointer-events: none;
+  padding: 40px;
+  z-index: 3;
+  color: #fff;
 }
 
-.left-overlay-text h1 {
-  color: #fff;
+.overlay-title {
   font-size: 2.1rem;
   font-weight: 700;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   margin: 0;
-  padding: 0 18px;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
-.left-overlay-text .overlay-sub {
+.overlay-sub {
   margin-top: 8px;
-  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.95);
 }
 
+/* right panel */
 .right-panel {
-  background: #fff;
-  min-height: 100vh;
-  padding-left: 48px;
-  padding-right: 48px;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
-.right-inner {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+/* inner card where form lives */
+.right-card {
+  padding-top: 6px;
+  padding-bottom: 18px;
 }
 
-/* smaller inputs */
+/* page title color */
+.title {
+  color: #03318d;
+  font-weight: 700;
+}
+
+/* small form tweaks */
 .form-control {
-  font-size: 0.92rem;
-  padding: 0.42rem 0.6rem;
+  font-size: 0.93rem;
+  padding: 0.44rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #e6e9ec;
 }
 
-.form-select {
-  font-size: 0.92rem;
-  padding: 0.3rem 0.5rem;
+.input-group .form-control {
+  border-right: 0;
 }
 
-/* primary button */
-.btn-success {
-  background: #2f855a;
-  border: none;
-}
-
-/* helper text */
-.text-muted {
-  color: #6b7280 !important;
-}
-
-/* icon button to match small input group */
 .btn-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.35rem 0.5rem;
-  min-width: 40px;
-  line-height: 1;
+  padding: 0.36rem 0.5rem;
+  border-radius: 8px;
 }
 
-/* slightly larger icon */
-.btn-icon i {
-  font-size: 1.05rem;
-  vertical-align: middle;
+/* primary dark button */
+.btn-dark {
+  background: #03318d;
+  border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 14px;
 }
 
-/* responsive */
+/* small helper text color */
+.text-muted {
+  color: #6b7280 !important;
+}
+
+/* invalid feedback smaller */
+.invalid-feedback.small {
+  font-size: 0.82rem;
+}
+
+/* responsive: stack on small screens */
 @media (max-width: 991.98px) {
+  .card-shell {
+    flex-direction: column-reverse;
+  }
+
   .left-image-panel {
     display: none;
   }
 
-  .right-inner {
-    padding-left: 24px;
-    padding-right: 24px;
+  .right-card {
+    padding-left: 20px;
+    padding-right: 20px;
     min-height: 60vh;
   }
 }

@@ -1,80 +1,94 @@
-<!-- SplitLogin_LeftImage.vue -->
 <template>
   <main class="split-signup min-vh-100 d-flex align-items-stretch">
     <div class="container-fluid px-0">
-      <div class="row gx-0">
-        <!-- LEFT: full-bleed image with centered H1 overlay -->
-        <aside class="col-12 col-lg-6 left-image-panel">
-          <div class="left-image-wrapper" aria-hidden="false">
-            <img src="../assets/img/main2.jpg" alt="illustration" class="left-image" />
-            <!-- centered text over the image -->
-            <div class="left-overlay-text">
-              <h1>SignIn to TestMyPlan
-                <p class="overlay-sub">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-              </h1>
+      <div class="row gx-0 justify-content-center">
 
-            </div>
-          </div>
-        </aside>
+        <!-- Centered card shell -->
+        <div class="col-12 col-xl-10">
+          <div class="card-shell d-flex overflow-hidden rounded-4">
 
-        <!-- RIGHT: login form (replaces signup buttons) -->
-        <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-          <div class="right-inner w-100 d-flex flex-column" style="max-width:520px; min-height:72vh;">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h4 class="mb-0">SigIn in to TestMyPlan</h4>
-                <small class="text-muted">Welcome back — please sign in to continue</small>
-              </div>
+            <!-- LEFT: full-bleed image with centered H1 overlay -->
+            <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
+              <div class="left-image-wrapper" aria-hidden="false">
+                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
+                <div class="left-gradient"></div>
 
-              <a class="small text-muted" href="#" @click.prevent="goToSignup">Sign up →</a>
-            </div>
-
-            <!-- Login form -->
-            <form @submit.prevent="onLogin" novalidate :class="{ 'was-validated': tried }">
-              <div class="mb-3">
-                <label class="form-label small mb-1">Email</label>
-                <input v-model.trim="email" required type="email" class="form-control form-control-sm"
-                  :class="{ 'is-invalid': emailError }" placeholder="Enter your email" />
-                <div class="invalid-feedback small">{{ emailError }}</div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small mb-1">Password</label>
-                <div class="input-group input-group-sm">
-                  <input :type="show ? 'text' : 'password'" v-model="password" required
-                    class="form-control form-control-sm" :class="{ 'is-invalid': passwordError }"
-                    placeholder="Enter your password" />
-                  <button type="button" class="btn btn-icon" @click="toggle" :aria-pressed="show"
-                    :aria-label="show ? 'Hide password' : 'Show password'">
-                    <i :class="show ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                  </button>
-                  <div class="invalid-feedback small">{{ passwordError }}</div>
+                <!-- overlay text -->
+                <div class="left-overlay-text">
+                  <h1 class="overlay-title">Sign in to TestMyPlan</h1>
+                  <p class="overlay-sub">Secure access for teams — pick up where you left off.</p>
                 </div>
               </div>
+            </aside>
 
-              <div class="d-flex justify-content-between align-items-center mb-3 small">
-                <div class="d-flex align-items-center">
-                  <input id="remember" type="checkbox" class="form-check-input me-1" v-model="remember" />
-                  <label for="remember" class="form-check-label">Remember me</label>
+            <!-- RIGHT: login form -->
+            <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
+              <div class="right-inner w-100 d-flex flex-column" style="max-width:520px; min-height:72vh;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h4 class="mb-0">Sign in to TestMyPlan</h4>
+                    <small class="text-muted">Welcome back — please sign in to continue</small>
+                  </div>
+
+                  <a class="small text-muted" href="#" @click.prevent="goToSignup">Sign up →</a>
                 </div>
-                <a class="small" href="#" @click.prevent="goToForgot">Forgot password?</a>
+
+                <!-- Login form -->
+                <form @submit.prevent="onLogin" novalidate :class="{ 'was-validated': tried }" autocomplete="on">
+                  <div class="mb-3">
+                    <label class="form-label small mb-1" for="email">Email</label>
+                    <input id="email" v-model.trim="email" required type="email" class="form-control form-control-sm"
+                      :class="{ 'is-invalid': emailError }" placeholder="Enter your email" autocomplete="email" />
+                    <div class="invalid-feedback small">{{ emailError }}</div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label small mb-1" for="password">Password</label>
+
+                    <div class="input-group input-group-sm">
+                      <input id="password" :type="show ? 'text' : 'password'" v-model="password" required
+                        class="form-control form-control-sm" :class="{ 'is-invalid': passwordError }"
+                        placeholder="Enter your password" autocomplete="current-password" />
+                      <button type="button" class="btn btn-icon" @click="toggle" :aria-pressed="String(show)"
+                        :aria-label="show ? 'Hide password' : 'Show password'" title="Toggle password visibility">
+                        <i :class="show ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                      </button>
+                    </div>
+
+                    <div class="invalid-feedback small mt-1">{{ passwordError }}</div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-3 small">
+                    <div class="d-flex align-items-center">
+                      <input id="remember" type="checkbox" class="form-check-input me-2" v-model="remember" />
+                      <label for="remember" class="form-check-label">Remember me</label>
+                    </div>
+                    <a class="small" href="#" @click.prevent="goToForgot">Forgot password?</a>
+                  </div>
+
+                  <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-dark btn-md" :disabled="submitting">
+                      <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
+                        aria-hidden="true"></span>
+                      Sign in
+                    </button>
+                  </div>
+
+                  <p v-if="message" :class="['mt-2', messageClass, 'small']" role="alert">{{ message }}</p>
+                </form>
+
+                <!-- optional small footer -->
+                <div class="mt-auto pt-3">
+                  <p class="small text-muted mb-0">By signing in you accept our <a href="#"
+                      class="text-decoration-underline">Terms</a>.</p>
+                </div>
+
               </div>
-
-              <div class="d-grid mb-3">
-                <button type="submit" class="btn btn-dark btn-md" :disabled="submitting">
-                  <span v-if="submitting" class="spinner-border spinner-border-sm me-2"></span>
-                  Sign in
-                </button>
-              </div>
-
-
-
-              <p v-if="message" :class="['mt-2', messageClass, 'small']" role="alert">{{ message }}</p>
-            </form>
-
+            </section>
 
           </div>
-        </section>
+        </div>
+
       </div>
     </div>
   </main>
@@ -94,17 +108,19 @@ export default {
       message: "",
       messageClass: "",
       emailError: "",
-      passwordError: ""
+      passwordError: "",
     };
   },
   methods: {
     toggle() {
       this.show = !this.show;
     },
+
     validate() {
       this.emailError = "";
       this.passwordError = "";
       let ok = true;
+
       if (!this.email) {
         this.emailError = "Email is required";
         ok = false;
@@ -112,35 +128,54 @@ export default {
         this.emailError = "Enter a valid email";
         ok = false;
       }
+
       if (!this.password) {
         this.passwordError = "Password is required";
         ok = false;
       }
+
       return ok;
     },
+
     async onLogin() {
       this.tried = true;
       this.message = "";
       if (!this.validate()) return;
+
       this.submitting = true;
       try {
-        // replace this demo delay with your real auth call
-        await new Promise((r) => setTimeout(r, 800));
+        // PUT your real auth call here (axios/fetch)
+        // Example (uncomment + configure):
+        // const res = await axios.post('/api/auth/login', { email: this.email, password: this.password, remember: this.remember });
+
+        // demo delay
+        await new Promise((r) => setTimeout(r, 700));
+
+        // Success behaviour (adjust to your flow)
         this.message = "Signed in (demo)";
         this.messageClass = "text-success";
-        // handle success (navigate, store token, etc.)
-        console.log("LOGIN", { email: this.email, remember: this.remember });
-      } catch (e) {
-        this.message = "Something went wrong";
+
+        // navigate to dashboard or next route
+        if (this.$router) {
+          this.$router.push({ path: "/dashboard" });
+        } else {
+          window.location.href = "/dashboard";
+        }
+      } catch (err: any) {
+        // handle API error extraction
+        this.message = err?.response?.data?.message || "Unable to sign in. Check credentials.";
         this.messageClass = "text-danger";
       } finally {
         this.submitting = false;
       }
     },
+
     onGoogle() {
-      // wire to your Google OAuth
+      // hook Google/OAuth if required
+      // e.g. window.location.href = '/auth/google'
       alert("Google sign-in (demo)");
     },
+
     goToForgot() {
       if (this.$router) {
         this.$router.push({ path: "/forgetpassword" });
@@ -148,111 +183,137 @@ export default {
       }
       window.location.href = "/forgetpassword";
     },
+
     goToSignup() {
       if (this.$router) {
         this.$router.push({ path: "/signup" });
         return;
       }
       window.location.href = "/signup";
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* keep styling consistent with your theme */
+/* THEME A — consistent card shell + left image + right panel */
 
-/* reset container gaps */
+/* page background (keeps subtle) */
 .split-signup {
-  background: #fff;
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+  padding: 32px 12px;
 }
 
-/* LEFT: full-bleed image panel */
+/* centered card shell */
+.card-shell {
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 12px 40px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(11, 42, 102, 0.06);
+}
+
+/* LEFT IMAGE PANEL */
 .left-image-panel {
   position: relative;
   padding: 0;
-  min-height: 100vh;
+  min-height: 520px;
   overflow: hidden;
-  display: block;
 }
 
-/* wrapper ensures position context */
 .left-image-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
 }
 
-/* image covers the whole left panel */
 .left-image {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 0;
+  filter: saturate(1.04) contrast(0.98);
 }
 
-/* overlay centered text */
+/* subtle gradient so white text pops */
+.left-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(1, 24, 39, 0.45) 0%, rgba(1, 24, 39, 0.12) 40%, rgba(1, 24, 39, 0.02) 100%);
+}
+
+/* overlay text */
 .left-overlay-text {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  flex-direction: column;
   text-align: center;
-  pointer-events: none;
+  padding: 40px;
+  z-index: 3;
+  color: #fff;
 }
 
-.left-overlay-text h1 {
-  color: #ffffff;
-  font-size: 2.25rem;
+.overlay-title {
+  font-size: 2.1rem;
   font-weight: 700;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   margin: 0;
-  padding: 0 18px;
-  line-height: 1.05;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
-.left-overlay-text .overlay-sub {
-  margin-top: 10px;
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
+.overlay-sub {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-/* RIGHT panel */
+/* RIGHT PANEL */
 .right-panel {
-  background: #fff;
-  min-height: 100vh;
-  padding-left: 48px;
-  padding-right: 48px;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
-/* form inputs scaled down slightly */
+/* form container */
+.right-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* typography */
+h4 {
+  font-weight: 700;
+  color: #03318d;
+}
+
+/* small tweaks to inputs and buttons */
 .form-control {
-  font-size: 0.92rem;
-  padding: 0.42rem 0.6rem;
+  font-size: 0.93rem;
+  padding: 0.44rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #e6e9ec;
 }
 
-/* btn-icon for eye toggle */
+.input-group .form-control {
+  border-right: 0;
+}
+
+/* eye toggle button */
 .btn-icon {
-  border: 0;
-  background: transparent;
-  padding: 0.35rem 0.45rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0.36rem 0.5rem;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid #e6e9ec;
   color: #6b7280;
-  font-size: 1rem;
-}
-
-.input-group .btn-icon {
-  min-width: 40px;
 }
 
 .btn-icon:focus {
@@ -260,58 +321,44 @@ export default {
   box-shadow: none;
 }
 
-/* provider button look small */
-.btn-outline-secondary {
-  background: #fff;
-  border: 1px solid #e6e9ec;
-  color: #111;
-}
-
-/* primary signin button */
-.btn-success {
-  background: #2f855a;
+/* dark primary button */
+.btn-dark {
+  background: #03318d;
   border: none;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 14px;
 }
 
-/* small helper text style */
+/* helper / muted text */
 .text-muted {
   color: #6b7280 !important;
 }
 
-/* compact pills (visual only) */
-.compact-pills {
-  gap: 18px;
-  padding: 8px 0 8px;
+/* invalid feedback smaller */
+.invalid-feedback.small {
+  font-size: 0.82rem;
 }
 
-.compact-pill {
-  width: 48px;
-  height: 8px;
-  border-radius: 10px;
-  background: #ececec;
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.03);
-}
-
-.compact-pill.active {
-  width: 40px;
-  background: #080808;
-  transform: translateY(-3px);
+/* footer small note */
+.right-inner>.mt-auto {
+  margin-top: 18px;
 }
 
 /* responsive */
 @media (max-width: 991.98px) {
-  .left-image-panel {
-    min-height: 40vh;
+  .card-shell {
+    flex-direction: column-reverse;
   }
 
-  .left-overlay-text h1 {
-    font-size: 1.5rem;
+  .left-image-panel {
+    display: none;
   }
 
   .right-inner {
-    min-height: 50vh;
-    padding-left: 24px;
-    padding-right: 24px;
+    padding-left: 20px;
+    padding-right: 20px;
+    min-height: 60vh;
   }
 }
 </style>
