@@ -7,10 +7,10 @@
         <div class="col-12 col-xl-10">
           <div class="card-shell d-flex overflow-hidden rounded-4">
 
-            <!-- LEFT: full-bleed image (desktop only) -->
+            <!-- LEFT: full-bleed image (Theme A) -->
             <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
               <div class="left-image-wrapper">
-                <img src="../assets/img/main2.jpg" alt="illustration" class="left-image" />
+                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
                 <div class="left-gradient"></div>
 
                 <div class="left-overlay-text">
@@ -20,11 +20,11 @@
               </div>
             </aside>
 
-            <!-- RIGHT: forgot password form -->
+            <!-- RIGHT: forgot password form (Theme A panel) -->
             <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-              <div class="right-card w-100" style="max-width:520px; min-height:60vh;">
+              <div class="right-card w-100" style="max-width:520px; min-height:72vh;">
                 <div class="mb-3">
-                  <h4 class="mb-0 title">Forgot password</h4>
+                  <h4 class="title mb-0">Forgot password</h4>
                   <small class="text-muted">We will send a reset link to your email</small>
                 </div>
 
@@ -42,7 +42,7 @@
                   </div>
 
                   <div class="d-grid mb-3">
-                    <button type="submit" class="btn btn-primary btn-md" :disabled="sending">
+                    <button type="submit" class="btn btn-dark btn-md" :disabled="sending">
                       <span v-if="sending" class="spinner-border spinner-border-sm me-2" role="status"
                         aria-hidden="true"></span>
                       Send reset instructions
@@ -100,11 +100,10 @@ export default {
 
       this.sending = true;
       try {
-        // Replace with your real API call if needed:
-        // await axios.post('/api/auth/forgot-password', { email: this.email });
+        // TODO: replace with your API call, e.g. axios.post('/api/auth/forgot-password', { email: this.email })
         await new Promise((r) => setTimeout(r, 900)); // demo delay
 
-        this.message = "If this email exists, we sent password reset instructions. Check your inbox.";
+        this.message = "If this email exists, we've sent password reset instructions. Check your inbox.";
         this.messageClass = "text-success";
       } catch (err: any) {
         this.message = "Unable to send reset email. Please try again later.";
@@ -126,7 +125,7 @@ export default {
 </script>
 
 <style scoped>
-/* THEME A: centered card shell + left image + right panel */
+/* THEME A: card shell + left image + right panel styles (matches your Signup layout) */
 
 /* page background */
 .split-signup {
@@ -166,7 +165,7 @@ export default {
   filter: saturate(1.04) contrast(0.98);
 }
 
-/* gradient to make white text pop */
+/* overlay gradient to improve text contrast */
 .left-gradient {
   position: absolute;
   inset: 0;
@@ -203,25 +202,26 @@ export default {
 /* RIGHT panel */
 .right-panel {
   background: #fff;
-  min-height: 520px;
-  padding-left: 48px;
-  padding-right: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-left: 40px;
+  padding-right: 40px;
 }
 
+/* inner card where form lives (matches signup card sizing) */
 .right-card {
-  padding: 22px 12px;
-  background: transparent;
+  padding-top: 6px;
+  padding-bottom: 18px;
 }
 
+/* page title color */
 .title {
   color: #03318d;
   font-weight: 700;
 }
 
-/* inputs */
+/* small form tweaks */
 .form-control {
   font-size: 0.93rem;
   padding: 0.44rem 0.6rem;
@@ -229,14 +229,21 @@ export default {
   border: 1px solid #e6e9ec;
 }
 
-/* primary button using brand blue */
-.btn-primary {
+/* primary button (dark / brand) */
+.btn-dark {
   background: #03318d;
   border: none;
   font-weight: 600;
   border-radius: 8px;
   padding: 10px 14px;
   color: #fff;
+}
+
+/* ! using btn-dark on submit (keeps same visual as signup) */
+.btn-md {
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /* spinner */
@@ -252,7 +259,7 @@ export default {
 
 /* message styles rely on messageClass (text-success / text-danger) */
 
-/* responsive */
+/* responsive stacking */
 @media (max-width: 991.98px) {
   .card-shell {
     flex-direction: column-reverse;

@@ -1,98 +1,109 @@
-<!-- VerifyEmailThemeFrontendOnly.vue (UI-only, no API calls) -->
 <template>
   <main class="split-signup min-vh-100 d-flex align-items-stretch">
     <div class="container-fluid px-0">
-      <div class="row gx-0">
-        <!-- LEFT: full-bleed image with overlay -->
-        <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
-          <div class="left-image-wrapper">
-            <img src="../assets/img/main2.jpg" alt="illustration" class="left-image" />
-            <div class="left-overlay-text">
-              <h1>
-                Verify your email
-                <p class="overlay-sub">Enter the email associated with your account and we'll send instructions.</p>
-              </h1>
-            </div>
-          </div>
-        </aside>
+      <div class="row gx-0 justify-content-center">
 
-        <!-- RIGHT: white panel (themed) -->
-        <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-          <div class="right-inner w-100 d-flex flex-column justify-content-center align-items-center">
-            <!-- header -->
-            <div class="mb-3 ">
-              <h4 class="mb-0">Verify your email</h4>
-              <small class="text-muted">Frontend-only demo — no API calls</small>
-            </div>
+        <!-- CENTERED CARD -->
+        <div class="col-12 col-xl-10">
+          <div class="card-shell d-flex overflow-hidden rounded-4">
 
-            <!-- loading state -->
-            <div v-if="view === 'loading'" class="text-center py-4">
-              <div class="spinner-border text-secondary" role="status" aria-hidden="true"></div>
-              <div class="mt-3 small text-muted">Verifying your email…</div>
-            </div>
+            <!-- LEFT: full-bleed image with overlay (Theme A) -->
+            <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
+              <div class="left-image-wrapper">
+                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
+                <div class="left-gradient"></div>
 
-            <!-- success state -->
-            <div v-else-if="view === 'success'" class="text-center">
-              <div class="icon-circle success mb-3">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" />
-                </svg>
+                <div class="left-overlay-text" aria-hidden="true">
+                  <h1 class="overlay-title">Verify your email</h1>
+                  <p class="overlay-sub">Enter the email associated with your account and we'll send instructions.</p>
+                </div>
               </div>
-              <h5 class="mb-1">Email verified</h5>
-              <p class="text-muted small mb-3">Thanks — your email has been verified. You can now sign in.</p>
-              <div class="d-grid" style="width:220px;">
-                <button class="btn btn-success" @click="goToSignin">Sign in</button>
-              </div>
-            </div>
+            </aside>
 
-            <!-- failure state -->
-            <div v-else class="text-center" style="max-width:420px; width:100%;">
-              <div class="icon-circle fail mb-3">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="#fff" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </div>
+            <!-- RIGHT: white panel (themed) -->
+            <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
+              <div class="right-inner w-100 d-flex flex-column justify-content-center align-items-center"
+                style="max-width:520px; min-height:72vh;">
 
-              <h5 class="mb-1">Verification failed</h5>
-              <p class="text-muted small mb-3">{{ failMessage }}</p>
+                <!-- header -->
+                <div class="mb-3 text-center w-100">
+                  <h4 class="mb-0 title">Verify your email</h4>
+                  <small class="text-muted">Frontend-only demo — no API calls</small>
+                </div>
 
-              <div v-if="mode === 'init'" class="d-grid gap-2 mb-3">
-                <button class="btn btn-outline-primary" @click="mode = 'resend'">Resend verification email</button>
-                <button class="btn btn-light" @click="goHome">Back to home</button>
-              </div>
+                <!-- loading state -->
+                <div v-if="view === 'loading'" class="text-center py-4" role="status" aria-live="polite">
+                  <div class="spinner-border" role="status" aria-hidden="true"></div>
+                  <div class="mt-3 small text-muted">Verifying your email…</div>
+                </div>
 
-              <!-- resend form -->
-              <div v-if="mode === 'resend'">
-                <form @submit.prevent="onResend" novalidate :class="{ 'was-validated': tried }">
-                  <div class="mb-3">
-                    <label class="form-label small mb-1">Email</label>
-                    <input v-model.trim="resendEmail" type="email" required class="form-control form-control-sm"
-                      :class="{ 'is-invalid': resendError }" placeholder="you@example.com" />
-                    <div class="invalid-feedback small">{{ resendError }}</div>
+                <!-- success state -->
+                <div v-else-if="view === 'success'" class="text-center" role="status">
+                  <div class="icon-circle success mb-3" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M20 6L9 17l-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    </svg>
+                  </div>
+                  <h5 class="mb-1">Email verified</h5>
+                  <p class="text-muted small mb-3">Thanks — your email has been verified. You can now sign in.</p>
+                  <div class="d-grid" style="width:220px;">
+                    <button class="btn btn-primary" @click="goToSignin">Sign in</button>
+                  </div>
+                </div>
+
+                <!-- failure state -->
+                <div v-else class="text-center" style="max-width:420px; width:100%;" role="alert" aria-live="polite">
+                  <div class="icon-circle fail mb-3" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+                    </svg>
                   </div>
 
-                  <div class="d-grid gap-2 mb-3">
-                    <button class="btn btn-primary" :disabled="resendLoading">
-                      <span v-if="resendLoading" class="spinner-border spinner-border-sm me-2"
-                        aria-hidden="true"></span>
-                      Resend verification email
-                    </button>
-                    <button type="button" class="btn btn-light" @click="mode = 'init'">Cancel</button>
+                  <h5 class="mb-1">Verification failed</h5>
+                  <p class="text-muted small mb-3">{{ failMessage }}</p>
+
+                  <div v-if="mode === 'init'" class="d-grid gap-2 mb-3">
+                    <button class="btn btn-outline-primary" @click="mode = 'resend'">Resend verification email</button>
+                    <button class="btn btn-light" @click="goHome">Back to home</button>
                   </div>
 
-                  <div v-if="resendMessage" :class="['small', resendMessageClass]">{{ resendMessage }}</div>
-                </form>
-              </div>
-            </div>
+                  <!-- resend form -->
+                  <div v-if="mode === 'resend'" class="w-100">
+                    <form @submit.prevent="onResend" novalidate :class="{ 'was-validated': tried }">
+                      <div class="mb-3">
+                        <label class="form-label small mb-1" for="resendEmail">Email</label>
+                        <input id="resendEmail" v-model.trim="resendEmail" type="email" required
+                          class="form-control form-control-sm" :class="{ 'is-invalid': resendError }"
+                          placeholder="you@example.com" />
+                        <div class="invalid-feedback small">{{ resendError }}</div>
+                      </div>
 
-            <div class="mt-4 text-center small text-muted" v-if="showHint">
-              Tip: preview states with <code>?status=success</code> or <code>?status=fail</code>, or use
-              <code>?token=ok</code>
-              to simulate success.
-            </div>
+                      <div class="d-grid gap-2 mb-3">
+                        <button class="btn btn-primary" :disabled="resendLoading" type="submit">
+                          <span v-if="resendLoading" class="spinner-border spinner-border-sm me-2"
+                            aria-hidden="true"></span>
+                          Resend verification email
+                        </button>
+
+                        <button type="button" class="btn btn-light" @click="mode = 'init'">Cancel</button>
+                      </div>
+
+                      <div v-if="resendMessage" :class="['small', resendMessageClass]">{{ resendMessage }}</div>
+                    </form>
+                  </div>
+                </div>
+
+                <div class="mt-4 text-center small text-muted" v-if="showHint">
+                  Tip: preview states with <code>?status=success</code> or <code>?status=fail</code>, or use
+                  <code>?token=ok</code> to simulate success.
+                </div>
+              </div>
+            </section>
+
           </div>
-        </section>
+        </div>
+
       </div>
     </div>
   </main>
@@ -132,7 +143,6 @@ export default {
     // 2) token-based demo: if token == 'ok' -> success, else fail
     if (token) {
       this.view = "loading";
-      // small delay to simulate network
       setTimeout(() => {
         if (token === "ok") {
           this.view = "success";
@@ -190,16 +200,29 @@ export default {
 </script>
 
 <style scoped>
-/* theme-consistent styles */
+/* THEME A — card shell + left image + right panel */
+
+/* page background */
 .split-signup {
-  background: #fff;
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+  padding: 28px 12px;
 }
 
-/* LEFT image */
+/* centered card shell */
+.card-shell {
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 12px 40px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(11, 42, 102, 0.06);
+}
+
+/* LEFT image panel */
 .left-image-panel {
   position: relative;
   padding: 0;
-  min-height: 100vh;
+  min-height: 520px;
   overflow: hidden;
 }
 
@@ -210,12 +233,19 @@ export default {
 }
 
 .left-image {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: saturate(1.04) contrast(0.98);
+}
+
+/* left gradient overlay to improve contrast */
+.left-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(1, 24, 39, 0.45) 0%, rgba(1, 24, 39, 0.12) 40%, rgba(1, 24, 39, 0.02) 100%);
+  pointer-events: none;
 }
 
 .left-overlay-text {
@@ -224,30 +254,30 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
+  flex-direction: column;
   text-align: center;
-  pointer-events: none;
+  padding: 40px;
+  z-index: 3;
+  color: #fff;
 }
 
-.left-overlay-text h1 {
-  color: #fff;
+.overlay-title {
   font-size: 2.1rem;
   font-weight: 700;
-  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   margin: 0;
-  padding: 0 18px;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
-.left-overlay-text .overlay-sub {
+.overlay-sub {
   margin-top: 8px;
-  font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
 }
 
 /* RIGHT panel */
 .right-panel {
   background: #fff;
-  min-height: 100vh;
+  min-height: 520px;
   padding-left: 48px;
   padding-right: 48px;
   display: flex;
@@ -255,6 +285,7 @@ export default {
   justify-content: center;
 }
 
+/* inner area */
 .right-inner {
   display: flex;
   flex-direction: column;
@@ -263,7 +294,13 @@ export default {
   text-align: center;
 }
 
-/* icons */
+/* title color */
+.title {
+  color: #03318d;
+  font-weight: 700;
+}
+
+/* icon circles */
 .icon-circle {
   width: 72px;
   height: 72px;
@@ -275,8 +312,8 @@ export default {
 }
 
 .icon-circle.success {
-  background: rgba(47, 133, 90, 0.12);
-  color: #2f855a;
+  background: rgba(3, 49, 141, 0.08);
+  color: #03318d;
 }
 
 .icon-circle.fail {
@@ -286,12 +323,22 @@ export default {
 
 /* buttons */
 .btn-primary {
-  background: #2f855a;
+  background: #03318d;
   border: none;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
 }
 
 .btn-outline-primary {
   border-color: rgba(11, 42, 102, 0.08);
+  background: #fff;
+  color: #03318d;
+}
+
+.btn-light {
+  background: #f8fafc;
+  border: 1px solid #e6eef7;
 }
 
 /* small helpers */
@@ -302,6 +349,8 @@ export default {
 .form-control {
   font-size: 0.95rem;
   padding: 0.42rem 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #e6e9ec;
 }
 
 /* code hint */
@@ -312,8 +361,19 @@ code {
   font-size: 0.85em;
 }
 
+/* spinners */
+.spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.14em;
+}
+
 /* responsive */
 @media (max-width: 991.98px) {
+  .card-shell {
+    flex-direction: column-reverse;
+  }
+
   .left-image-panel {
     display: none;
   }
@@ -324,7 +384,7 @@ code {
     min-height: 60vh;
   }
 
-  .left-overlay-text h1 {
+  .overlay-title {
     font-size: 1.5rem;
   }
 }
