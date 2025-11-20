@@ -56,7 +56,7 @@
                         :type="showPassword ? 'text' : 'password'" placeholder="Enter a password (min 8 characters)"
                         required />
                       <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
-                        @click="toggleShowPassword" :aria-pressed="String(showPassword)"
+                        @click="toggleShowPassword" :aria-pressed="showPassword"
                         :aria-label="showPassword ? 'Hide password' : 'Show password'"
                         title="Toggle password visibility">
                         <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
@@ -74,7 +74,7 @@
                         :class="['form-control', 'form-control-sm', { 'is-invalid': confirmError }]"
                         :type="showPassword ? 'text' : 'password'" placeholder="Re-enter password" required />
                       <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
-                        @click="toggleShowPassword" :aria-pressed="String(showPassword)"
+                        @click="toggleShowPassword" :aria-pressed="showPassword"
                         :aria-label="showPassword ? 'Hide password' : 'Show password'"
                         title="Toggle password visibility">
                         <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
@@ -110,7 +110,21 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+
+interface SignupForm {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+/** Minimal typed shape for router we use (avoid 'any') */
+interface RouterLike {
+  push(location: { path: string; query?: Record<string, string> }): Promise<void> | void;
+}
+
+export default defineComponent({
   name: "SignUpEmailFormThemeA",
   data() {
     return {
@@ -119,36 +133,36 @@ export default {
         email: "",
         password: "",
         confirmPassword: ""
-      },
-      tried: false,
-      submitting: false,
-      message: "",
-      messageClass: "",
-      nameError: "",
-      emailError: "",
-      passwordError: "",
-      confirmError: "",
-      showPassword: false
+      } as SignupForm,
+      tried: false as boolean,
+      submitting: false as boolean,
+      message: "" as string,
+      messageClass: "" as string,
+      nameError: "" as string,
+      emailError: "" as string,
+      passwordError: "" as string,
+      confirmError: "" as string,
+      showPassword: false as boolean
     };
   },
   methods: {
-    toggleShowPassword() {
+    toggleShowPassword(): void {
       this.showPassword = !this.showPassword;
     },
 
-    validate() {
+    validate(): boolean {
       this.nameError = "";
       this.emailError = "";
       this.passwordError = "";
       this.confirmError = "";
       let ok = true;
 
-      if (!this.form.name) {
+      if (!this.form.name || !this.form.name.trim()) {
         this.nameError = "Name is required";
         ok = false;
       }
 
-      if (!this.form.email) {
+      if (!this.form.email || !this.form.email.trim()) {
         this.emailError = "Email is required";
         ok = false;
       } else if (!/^\S+@\S+\.\S+$/.test(this.form.email)) {
@@ -175,33 +189,23 @@ export default {
       return ok;
     },
 
-    async onSubmit() {
+    async onSubmit(): Promise<void> {
       this.tried = true;
       this.message = "";
+      this.messageClass = "";
+
       if (!this.validate()) return;
 
       this.submitting = true;
       try {
-        const payload = {
-          name: this.form.name,
-          email: this.form.email,
-          password: this.form.password
-        };
-
-        // ======= PUT YOUR API CALL HERE =======
-        // Example:
-        // const res = await axios.post('/api/auth/signup/email', payload);
-        // handle response or errors accordingly
-        // ======================================
-
-        // demo delay to simulate network
+        // NO API integration here — we'll wire this up later.
+        // A short delay simulates network so UI shows loading state.
         await new Promise((r) => setTimeout(r, 800));
 
         this.message = "Account created — check your email for verification.";
         this.messageClass = "text-success";
 
-        // keep email for next step
-        const emailToSend = this.form.email;
+        const emailToSend = this.form.email.trim();
 
         // clear sensitive fields
         this.form.password = "";
@@ -209,31 +213,45 @@ export default {
         this.tried = false;
         this.showPassword = false;
 
-        // navigate to email auth / instructions
+        // navigate to next step (email verification/instructions)
+        // Use a typed router guard to avoid 'any' casts.
         const target = { path: "/emailauth", query: { email: emailToSend } };
-        if (this.$router) {
-          this.$router.push(target);
+
+        // Cast through unknown to safely assert the shape without 'any'
+        const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
+        if (maybeRouter && typeof maybeRouter.push === "function") {
+          // Router push might return a Promise or void based on router implementation
+          await maybeRouter.push(target);
         } else {
+          // Fallback to window navigation when no router is present
           window.location.href = `/emailauth?email=${encodeURIComponent(emailToSend)}`;
         }
-      } catch (err) {
-        this.message = err?.response?.data?.message || "Unable to create account. Try again.";
+      } catch (err: unknown) {
+        // Generic safe error handling (no axios)
+        if (err instanceof Error) {
+          this.message = err.message || "Unable to create account. Try again.";
+        } else {
+          this.message = "Unable to create account. Try again.";
+        }
         this.messageClass = "text-danger";
       } finally {
         this.submitting = false;
       }
     },
 
-    goToSignin() {
-      if (this.$router) {
-        this.$router.push("/login");
+    goToSignin(): void {
+      const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
+      if (maybeRouter && typeof maybeRouter.push === "function") {
+        void maybeRouter.push({ path: "/login" });
       } else {
         window.location.href = "/login";
       }
     }
   }
-};
+});
 </script>
+
+
 
 <style scoped>
 /* THEME A: card shell + left image + right panel styles */

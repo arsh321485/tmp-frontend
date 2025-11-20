@@ -49,7 +49,7 @@
                       <input id="password" :type="show ? 'text' : 'password'" v-model="password" required
                         class="form-control form-control-sm" :class="{ 'is-invalid': passwordError }"
                         placeholder="Enter your password" autocomplete="current-password" />
-                      <button type="button" class="btn btn-icon" @click="toggle" :aria-pressed="String(show)"
+                      <button type="button" class="btn btn-icon" @click="toggle" :aria-pressed="show"
                         :aria-label="show ? 'Hide password' : 'Show password'" title="Toggle password visibility">
                         <i :class="show ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                       </button>
@@ -79,8 +79,9 @@
 
                 <!-- optional small footer -->
                 <div class="mt-auto pt-3">
-                  <p class="small text-muted mb-0">By signing in you accept our <a href="#"
-                      class="text-decoration-underline">Terms</a>.</p>
+                  <p class="small text-muted mb-0">
+                    By signing in you accept our <a href="#" class="text-decoration-underline">Terms</a>.
+                  </p>
                 </div>
 
               </div>
@@ -95,28 +96,35 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+
+/** Minimal typed shape for router (avoids using `any`) */
+interface RouterLike {
+  push(location: { path: string; query?: Record<string, string> }): Promise<void> | void;
+}
+
+export default defineComponent({
   name: "SplitLogin_LeftImage",
   data() {
     return {
-      email: "",
-      password: "",
-      remember: false,
-      show: false,
-      tried: false,
-      submitting: false,
-      message: "",
-      messageClass: "",
-      emailError: "",
-      passwordError: "",
+      email: "" as string,
+      password: "" as string,
+      remember: false as boolean,
+      show: false as boolean,
+      tried: false as boolean,
+      submitting: false as boolean,
+      message: "" as string,
+      messageClass: "" as string,
+      emailError: "" as string,
+      passwordError: "" as string,
     };
   },
   methods: {
-    toggle() {
+    toggle(): void {
       this.show = !this.show;
     },
 
-    validate() {
+    validate(): boolean {
       this.emailError = "";
       this.passwordError = "";
       let ok = true;
@@ -137,62 +145,66 @@ export default {
       return ok;
     },
 
-    async onLogin() {
+    async onLogin(): Promise<void> {
       this.tried = true;
       this.message = "";
+      this.messageClass = "";
+
       if (!this.validate()) return;
 
       this.submitting = true;
       try {
-        // PUT your real auth call here (axios/fetch)
-        // Example (uncomment + configure):
-        // const res = await axios.post('/api/auth/login', { email: this.email, password: this.password, remember: this.remember });
+        // NO API integration here — simulate network delay for UI testing
+        await new Promise<void>((resolve) => setTimeout(() => resolve(), 700));
 
-        // demo delay
-        await new Promise((r) => setTimeout(r, 700));
-
-        // Success behaviour (adjust to your flow)
+        // Success behaviour (demo)
         this.message = "Signed in (demo)";
         this.messageClass = "text-success";
 
-        // navigate to dashboard or next route
-        if (this.$router) {
-          this.$router.push({ path: "/dashboard" });
+        // Navigate to dashboard (typed router guard)
+        const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
+        if (maybeRouter && typeof maybeRouter.push === "function") {
+          await maybeRouter.push({ path: "/dashboard" });
         } else {
           window.location.href = "/dashboard";
         }
-      } catch (err: any) {
-        // handle API error extraction
-        this.message = err?.response?.data?.message || "Unable to sign in. Check credentials.";
+      } catch (err: unknown) {
+        // Narrow unknown -> Error (no `any`)
+        if (err instanceof Error) {
+          this.message = err.message || "Unable to sign in. Check credentials.";
+        } else {
+          this.message = "Unable to sign in. Check credentials.";
+        }
         this.messageClass = "text-danger";
       } finally {
         this.submitting = false;
       }
     },
 
-    onGoogle() {
-      // hook Google/OAuth if required
-      // e.g. window.location.href = '/auth/google'
-      alert("Google sign-in (demo)");
+    onGoogle(): void {
+      // demo placeholder
+      void alert("Google sign-in (demo)");
     },
 
-    goToForgot() {
-      if (this.$router) {
-        this.$router.push({ path: "/forgetpassword" });
+    goToForgot(): void {
+      const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
+      if (maybeRouter && typeof maybeRouter.push === "function") {
+        void maybeRouter.push({ path: "/forgetpassword" });
         return;
       }
       window.location.href = "/forgetpassword";
     },
 
-    goToSignup() {
-      if (this.$router) {
-        this.$router.push({ path: "/signup" });
+    goToSignup(): void {
+      const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
+      if (maybeRouter && typeof maybeRouter.push === "function") {
+        void maybeRouter.push({ path: "/signup" });
         return;
       }
       window.location.href = "/signup";
     },
   },
-};
+});
 </script>
 
 <style scoped>

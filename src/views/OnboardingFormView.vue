@@ -98,89 +98,120 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+interface DomainOption {
+  value: string;
+  label: string;
+  desc: string;
+  iconHtml: string;
+}
+
+interface LocalState {
+  organization: string;
+  location: string;
+}
+
 export default defineComponent({
   name: "DomainsOnboardingThemeA",
   data() {
+    const domainOptions: DomainOption[] = [
+      {
+        value: "cybersecurity",
+        label: "Cybersecurity",
+        desc: "Good for B2B businesses",
+        iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg"><path d="M12 2l7 3v4c0 5-3.6 9.7-7 11-3.4-1.3-7-6-7-11V5l7-3z" fill="#eef6ff"/>
+          <path d="M12 8v5l3 2" stroke="#2f855a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+      },
+      {
+        value: "data-privacy",
+        label: "Data Privacy",
+        desc: "Good for B2B businesses",
+        iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" fill="#fff7ed"/>
+          <path d="M7 12h10M7 8h10M7 16h6" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+      },
+      {
+        value: "business-continuity",
+        label: "Business Continuity",
+        desc: "Good for B2B businesses",
+        iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="#ecfdf5"/>
+          <path d="M12 8v5l3 2" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+      },
+      {
+        value: "all",
+        label: "All",
+        desc: "Select all domains",
+        iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+          xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" fill="#ebf8ff"/>
+          <path d="M8 12h8M8 8h8M8 16h5" stroke="#0369a1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+      }
+    ];
+
     return {
-      submitting: false,
+      submitting: false as boolean,
       local: {
         organization: "",
         location: ""
-      },
-      domainOptions: [
-        // restored original colored icons
-        {
-          value: "cybersecurity",
-          label: "Cybersecurity",
-          desc: "Good for B2B businesses",
-          iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg"><path d="M12 2l7 3v4c0 5-3.6 9.7-7 11-3.4-1.3-7-6-7-11V5l7-3z" fill="#eef6ff"/>
-            <path d="M12 8v5l3 2" stroke="#2f855a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>`
-        },
-        {
-          value: "data-privacy",
-          label: "Data Privacy",
-          desc: "Good for B2B businesses",
-          iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="3" fill="#fff7ed"/>
-            <path d="M7 12h10M7 8h10M7 16h6" stroke="#d97706" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>`
-        },
-        {
-          value: "business-continuity",
-          label: "Business Continuity",
-          desc: "Good for B2B businesses",
-          iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" fill="#ecfdf5"/>
-            <path d="M12 8v5l3 2" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>`
-        },
-        {
-          value: "all",
-          label: "All",
-          desc: "Select all domains",
-          iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"
-            xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="18" height="18" rx="4" fill="#ebf8ff"/>
-            <path d="M8 12h8M8 8h8M8 16h5" stroke="#0369a1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>`
-        }
-      ],
+      } as LocalState,
+      domainOptions,
       selectedDomains: [] as string[]
     };
   },
   methods: {
-    isSelected(val: string) {
+    isSelected(val: string): boolean {
       return this.selectedDomains.includes(val);
     },
-    toggle(val: string) {
+
+    toggle(val: string): void {
       if (val === "all") {
         const hasAll = this.isSelected("all");
         if (hasAll) {
           this.selectedDomains = [];
         } else {
-          this.selectedDomains = this.domainOptions.map((o: any) => o.value);
+          // copy all values from domainOptions
+          this.selectedDomains = this.domainOptions.map((o: DomainOption) => o.value);
         }
       } else {
         const idx = this.selectedDomains.indexOf(val);
-        if (idx === -1) this.selectedDomains.push(val);
-        else this.selectedDomains.splice(idx, 1);
+        if (idx === -1) {
+          this.selectedDomains.push(val);
+        } else {
+          this.selectedDomains.splice(idx, 1);
+        }
 
-        const nonAll = this.domainOptions.filter((o: any) => o.value !== "all").map((o: any) => o.value);
-        const allSelected = nonAll.every((v) => this.selectedDomains.includes(v));
-        if (allSelected && !this.selectedDomains.includes("all")) this.selectedDomains.push("all");
+        // maintain 'all' selection consistency
+        const nonAll = this.domainOptions
+          .filter((o: DomainOption) => o.value !== "all")
+          .map((o: DomainOption) => o.value);
+
+        const allSelected = nonAll.every((v: string) => this.selectedDomains.includes(v));
+
+        if (allSelected && !this.selectedDomains.includes("all")) {
+          this.selectedDomains.push("all");
+        }
+
         if (!allSelected && this.selectedDomains.includes("all")) {
           const i = this.selectedDomains.indexOf("all");
           if (i !== -1) this.selectedDomains.splice(i, 1);
         }
       }
+
+      // emit typed payload (Vue's emit is untyped in Options API; keep payload concrete)
       this.$emit("update:value", [...this.selectedDomains]);
     },
-    onFinish() {
+
+    onFinish(): void {
       if (!this.local.location) {
-        alert("Please select a location.");
+        // small UX fallback — prefer non-blocking UI in components
+        window.alert("Please select a location.");
         return;
       }
+
       this.submitting = true;
       setTimeout(() => {
         this.submitting = false;
