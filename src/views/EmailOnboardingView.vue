@@ -124,7 +124,7 @@
                   <button class="btn finish-btn" @click="onFinish" :disabled="submitting" aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
-                    Finish
+                    Connect to Mattermost
                   </button>
                 </div>
 

@@ -1,35 +1,367 @@
-@import './base.css';
+/* Page background */
+.se-page {
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+}
 
-#app {
-  max-width: 1280px;
+/* Card container spacing to match screenshot */
+.se-card-col {
+  padding: 48px 10px;
+}
+
+/* Card style */
+.se-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(11, 42, 102, 0.06);
+  box-shadow: 0 8px 30px rgba(18, 38, 84, 0.06);
+  min-height: 560px;
+  max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
 }
 
-a,
-.green {
+/* LEFT image panel */
+.se-left {
+  width: 52%;
+  min-height: 560px;
+  position: relative;
+  padding: 0;
+  /* background: #061333; */
+}
+
+.se-left-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(0.98);
+}
+
+/* overlay text */
+.se-left-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  pointer-events: none;
+  padding: 24px;
+}
+
+.se-left-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.se-left-sub {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+}
+
+/* DATA PROTECTION pill */
+.se-data-protection {
+  margin-top: 60px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #c7ffff;
+}
+
+/* RIGHT panel */
+.se-right {
+  width: 48%;
+  padding: 40px 56px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.se-right-inner {
+  width: 100%;
+}
+
+/* header row increased gap so providers sit lower */
+.se-header-row {
+  margin-bottom: 24px;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* sign-in link style */
+.tmp-signin-link {
+  color: #6c757d;
   text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+.tmp-signin-link:hover {
+  color: #03318d;
+  text-decoration: underline;
+}
+
+/* header/title */
+.se-title {
+  color: #03318d;
+  font-weight: 700;
+}
+
+/* providers list */
+.se-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 0;
+}
+
+/* provider row */
+.se-provider {
+  background: #fff;
+  border: 1px solid rgba(11, 42, 102, 0.06);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.se-provider:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 34px rgba(9, 30, 66, 0.06);
+}
+
+/* icon pill */
+.se-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f5f7fa, #ebf1f9);
+}
+
+.se-icon img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(10%) sepia(90%) saturate(3000%) hue-rotate(205deg) brightness(80%) contrast(105%);
+}
+
+/* labels */
+.se-labels .se-main {
+  font-weight: 600;
+  color: #03318d;
+}
+
+.se-labels .se-sub {
+  color: #687388;
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* arrow */
+.se-arrow {
+  margin-left: auto;
+  color: rgba(11, 42, 102, 0.18);
+  font-size: 22px;
+}
+
+/* email link and terms */
+.se-email-link {
+  color: #6c6c6c;
+  text-decoration: underline;
+}
+
+/* mobile button styling override (keeps bootstrap btn styles) */
+.se-email-btn {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: #03318d;
+}
+
+/* Responsive: hide left panel on md and below; reduce paddings so no big bottom gap */
+@media (max-width: 991.98px) {
+  .se-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .se-left {
+    display: none !important;
+  }
+
+  .se-right {
+    width: 100%;
+    padding: 28px 20px;
+  }
+
+  .se-card-col {
+    padding: 24px 10px;
+  }
+
+  .se-data-protection {
+    display: none;
+  }
+
+  .se-left-title {
+    font-size: 20px;
+  }
+
+  .se-header-row {
+    margin-bottom: 18px;
+  }
+
+  /* on small screens make provider buttons slightly taller for touch */
+  .se-provider {
+    padding: 16px 18px;
+  }
+
+  .se-provider .se-main {
+    font-size: 1rem;
+  }
+
+  .se-provider .se-sub {
+    font-size: 0.85rem;
   }
 }
 
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
+/* Very large screens: cap width so card doesn't become extremely wide */
+@media (min-width: 1600px) {
+  .se-card {
+    max-width: 1200px;
+  }
+}
+
+/* onbaording */
+.btn-primary {
+  background: #03318d;
+  border: none;
+  padding: 10px 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.domains-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+/* domain card styles (theme A) */
+.domain-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #eef2f7;
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  cursor: pointer;
+  position: relative;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.domain-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.04);
+}
+
+.domain-card:focus {
+  outline: none;
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.06);
+  transform: translateY(-3px);
+}
+
+/* title/sub */
+.domain-title {
+  font-weight: 600;
+  font-size: 0.98rem;
+  color: #0b1220;
+}
+
+.domain-sub {
+  margin-top: 4px;
+  font-size: 0.80rem;
+  color: #6b7280;
+}
+
+/* Selected tile: green look (replace tick) */
+.domain-card.selected {
+  border-color: rgba(5, 150, 105, 0.22);
+  /* green border */
+  background: linear-gradient(180deg, #f0fdf4, #ecfdf3);
+  /* soft green tint */
+  box-shadow: 0 12px 32px rgba(5, 150, 105, 0.06);
+  /* soft green glow */
+  transform: translateY(-6px);
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+/* Make the domain-title slightly darker on select for contrast */
+.domain-card.selected .domain-title {
+  color: #044f2d;
+}
+
+/* Optional: highlight the icon area to reinforce selected state */
+.domain-card.selected .domain-icon {
+  background: linear-gradient(180deg, rgba(5, 150, 105, 0.06), rgba(5, 150, 105, 0.03));
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.04) inset;
+}
+
+/* If you had .domain-check removed, ensure it doesn't take space */
+.domain-check {
+  display: none !important;
+}
+
+
+
+
+
+
+/* --- Replace tick with green border on iPad (1024x1366) and tablet range --- */
+
+/* Exact iPad portrait (1024 x 1366) — hide checkmark and use green border */
+@media (width: 1024px) and (height: 1366px) {
+
+  /* hide the floating tick */
+  .domain-card .domain-check {
+    display: none !important;
   }
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
+  /* selected state: green border + subtle green glow */
+  .domain-card.selected {
+    border-color: rgba(5, 150, 105, 0.18);
+    /* softer green border */
+    box-shadow: 0 12px 32px rgba(5, 150, 105, 0.06);
+    background: linear-gradient(180deg, #f0fdf4, #ecfdf3);
+    /* very light green tint */
+    transform: translateY(-6px);
+  }
+}
+
+/* Broader tablet widths — same behavior so it looks consistent across iPads/tablets */
+@media (min-width: 768px) and (max-width: 1366px) and (pointer: coarse) {
+  .domain-card .domain-check {
+    display: none !important;
+  }
+
+  .domain-card.selected {
+    border-color: rgba(5, 150, 105, 0.18);
+    box-shadow: 0 12px 32px rgba(5, 150, 105, 0.06);
+    background: linear-gradient(180deg, #f0fdf4, #ecfdf3);
+    transform: translateY(-6px);
   }
 }

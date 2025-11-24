@@ -6,6 +6,9 @@ import EmailAuthView from '@/views/EmailAuthView.vue'
 import ForgetPasswordView from '@/views/ForgetPasswordView.vue'
 import SignupEmailView from '@/views/SignupEmailView.vue'
 import OnboardingFormView from '@/views/OnboardingFormView.vue'
+import TestView from '@/views/TestView.vue'
+import MattermostView from '@/views/MattermostView.vue'
+import EmailOnboardingView from '@/views/EmailOnboardingView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +30,19 @@ const router = createRouter({
       path: '/',
       name: 'signup',
       component: SignupView,
+    },
+    {
+      path: '/test',
+      name: 'test',
+      component: TestView
+    }, {
+      path: '/email-onboarding',
+      name: 'email-onboarding',
+      component: EmailOnboardingView
+    }, {
+      path: '/mattermost',
+      name: 'mattermost',
+      component: MattermostView
     },
     {
       path: '/login',
