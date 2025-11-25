@@ -105,6 +105,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
 type DomainOption = {
   value: string;
@@ -116,6 +117,8 @@ type DomainOption = {
 export default defineComponent({
   name: "OnboardingPage",
   setup() {
+    const router = useRouter();
+
     const domainOptions = ref<DomainOption[]>([
       {
         value: "cybersecurity",
@@ -199,10 +202,14 @@ export default defineComponent({
         return;
       }
       submitting.value = true;
+
+      // simulate submission then navigate to /add-location
       setTimeout(() => {
         submitting.value = false;
-        showMattermost.value = true;
-        mm.status = "pending";
+        // navigate to add-location route
+        router.push("/add-location").catch(() => {
+          // ignore navigation errors (like same route)
+        });
       }, 700);
     }
 

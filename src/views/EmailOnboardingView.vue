@@ -88,7 +88,8 @@
                   <button class="btn finish-btn" @click="onFinish" :disabled="submitting" :aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
-                    <a href="/mattermost" class="text-white text-decoration-none"> Connect to mattermost</a>
+                    <!-- <a href="/mattermost" class="text-white text-decoration-none"> Connect to mattermost</a> -->
+                    Connect to mattermost
                   </button>
 
                 </div>
@@ -104,6 +105,8 @@
 
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+
 
 type DomainOption = {
   value: string;
@@ -115,6 +118,7 @@ type DomainOption = {
 export default defineComponent({
   name: "OnboardingPage",
   setup() {
+    const router = useRouter();
     const domainOptions = ref<DomainOption[]>([
       {
         value: "cybersecurity",
@@ -200,8 +204,12 @@ export default defineComponent({
       submitting.value = true;
       setTimeout(() => {
         submitting.value = false;
-        showMattermost.value = true;
-        mm.status = "pending";
+
+        // showMattermost.value = true;
+        // mm.status = "pending";
+        router.push("/mattermost").catch(() => {
+          // ignore navigation errors (like same route)
+        });
       }, 700);
     }
 

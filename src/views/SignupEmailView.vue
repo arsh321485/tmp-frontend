@@ -88,7 +88,7 @@
                     <button class="btn btn-dark btn-md" :disabled="submitting">
                       <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                         aria-hidden="true"></span>
-                      <a href="/email-onboarding" class="text-white">Create account</a>
+                      <a href="/email-onboarding" class="text-white text-decoration-none">Create account</a>
                     </button>
                   </div>
 

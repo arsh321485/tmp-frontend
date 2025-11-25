@@ -112,8 +112,15 @@
 </template>
 
 <script lang="ts">
+import { useRouter } from "vue-router";
 export default {
   name: "OnboardingPage",
+  setup() {
+    const router = useRouter();
+    return {
+      router
+    };
+  },
   data() {
     return {
       // keep your original state
@@ -182,9 +189,15 @@ export default {
       this.submitting = true;
       setTimeout(() => {
         this.submitting = false;
+        this.router.push("/add-location").catch(() => {
+          // ignore navigation errors
+        });
+
         // any additional finish logic can go here
       }, 700);
     }
+
+
   }
 };
 </script>
