@@ -9,6 +9,7 @@ import OnboardingFormView from '@/views/OnboardingFormView.vue'
 import TestView from '@/views/TestView.vue'
 import MattermostView from '@/views/MattermostView.vue'
 import EmailOnboardingView from '@/views/EmailOnboardingView.vue'
+import AddLocationView from '@/views/AddLocationView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +32,12 @@ const router = createRouter({
       name: 'signup',
       component: SignupView,
     },
+    {
+      path: '/add-location',
+      name: 'addlocation',
+      component: AddLocationView
+    },
+
     {
       path: '/test',
       name: 'test',

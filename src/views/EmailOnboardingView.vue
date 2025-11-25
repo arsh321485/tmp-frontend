@@ -23,46 +23,9 @@
                   <p class="se-sub">Before we fix your information assets...</p>
                 </div>
 
-                <!-- provider selection row (CENTERED) -->
-                <div class="providers-row row gx-3 mb-4 justify-content-center">
-                  <div class="col-12 col-md-10">
-                    <div
-                      class="provider-row-inner d-flex gap-3 flex-column flex-md-row align-items-center justify-content-center">
-                      <!-- Communication providers -->
-                      <div class="provider-group text-center">
-                        <h6 class="group-title ">Choose your communication platform</h6>
-                        <div class="tiles d-flex flex-wrap justify-content-center gap-2">
-                          <button v-for="p in commProviders" :key="p.value" type="button" class="provider-tile"
-                            :class="{ active: selectedComm === p.value }" @click="selectedComm = p.value"
-                            :aria-pressed="selectedComm === p.value">
-                            <div class="tile-icon" v-html="p.icon"></div>
-                            <div class="tile-label">{{ p.label }}</div>
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- Vertical divider (hidden on small screens) -->
-                      <div class="divider d-none d-md-block"></div>
-
-                      <!-- PM providers -->
-                      <div class="provider-group text-center">
-                        <h6 class="group-title">Choose your Project Management platform</h6>
-                        <div class="tiles d-flex flex-wrap justify-content-center gap-2">
-                          <button v-for="p in pmProviders" :key="p.value" type="button" class="provider-tile"
-                            :class="{ active: selectedPM === p.value }" @click="selectedPM = p.value"
-                            :aria-pressed="selectedPM === p.value">
-                            <div class="tile-icon" v-html="p.icon"></div>
-                            <div class="tile-label">{{ p.label }}</div>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <!-- Add organization heading -->
                 <div class="text-center mb-3">
-                  <h5 class="org-heading " style=" color: #03318d;">Add Organization Details</h5>
+                  <h5 class="org-heading" style="color: #03318d;">Add Organization Details</h5>
                 </div>
 
                 <!-- organization inputs (two side-by-side) -->
@@ -85,7 +48,7 @@
 
                 <!-- country -->
                 <div class="row gx-3 mb-4">
-                  <div class="col-12 col-md-8">
+                  <div class="col-12 col-md-6">
                     <label class="form-label small mb-1">Country</label>
                     <select v-model="local.location" class="form-select form-select-sm">
                       <option value="" disabled>Select country</option>
@@ -102,7 +65,7 @@
                 <!-- domains grid -->
                 <div class="domains-section mb-4">
                   <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label h5 text-center   mb-0" style=" color: #03318d;">Domains</label>
+                    <label class="form-label h5 text-center mb-0" style="color: #03318d;">Domains</label>
                     <small class="text-muted">Choose one or more</small>
                   </div>
 
@@ -112,7 +75,7 @@
                       @keydown.enter.prevent="toggleDomain(opt.value)">
                       <div class="domain-icon" v-html="opt.iconHtml"></div>
                       <div class="domain-body">
-                        <div class="domain-title " style=" color: #03318d;">{{ opt.label }}</div>
+                        <div class="domain-title" style="color: #03318d;">{{ opt.label }}</div>
                         <div class="domain-sub small text-muted">{{ opt.desc }}</div>
                       </div>
                     </label>
@@ -121,57 +84,17 @@
 
                 <!-- finish button aligned right corner -->
                 <div class="d-flex justify-content-end">
-                  <button class="btn finish-btn" @click="onFinish" :disabled="submitting" aria-busy="submitting">
+                  <!-- use :aria-busy to bind the boolean, not a literal string -->
+                  <button class="btn finish-btn" @click="onFinish" :disabled="submitting" :aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
-                    Connect to Mattermost
+                    <a href="/mattermost" class="text-white text-decoration-none"> Connect to mattermost</a>
                   </button>
+
                 </div>
 
               </div>
             </aside>
-
-            <!-- RIGHT: mattermost/status panel (hidden until showMattermost) -->
-            <!-- <section v-show="showMattermost" class="se-right mattermost-panel">
-              <div class="se-right-inner">
-                <h4 class="mb-1 se-title">I'm your reporting manager</h4>
-                <p class="text-muted mb-3">Let's set up your reporting time</p>
-
-                <p class="mattermost-text mb-3">Please setup your email with Mattermost to continue...</p>
-
-                <div class="mb-3 d-flex gap-2">
-                  <button class="btn btn-primary" :disabled="mm.connecting" @click="connectToMattermost">
-                    <span v-if="mm.connecting" class="spinner-border spinner-border-sm me-2" role="status"
-                      aria-hidden="true"></span>
-                    Connect to Mattermost
-                  </button>
-                  <button class="btn btn-outline-secondary" @click="closeMattermost">Back</button>
-                </div>
-
-                <div class="status-box mt-3">
-                  <div v-if="mm.status === 'pending'" class="loading-icon">
-                    <div class="blue-circle mx-auto">
-                      <div class="dots"><span></span><span></span><span></span></div>
-                    </div>
-                  </div>
-
-                  <div v-else class="success-icon">
-                    <div class="green-circle mx-auto">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <path d="M20 6L9 17l-5-5" stroke="#28a745" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <p class="text-center status-text mb-0" :class="mm.status === 'connected' ? 'status-success' : ''">
-                    Status: {{ mm.status === 'pending' ? 'Pending' : 'Connected' }}
-                  </p>
-
-                </div>
-              </div>
-            </section> -->
-
           </div> <!-- se-card -->
         </div>
       </div>
@@ -179,11 +102,20 @@
   </main>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, reactive, ref } from "vue";
+
+type DomainOption = {
+  value: string;
+  label: string;
+  desc: string;
+  iconHtml: string;
+};
+
+export default defineComponent({
   name: "OnboardingPage",
-  data() {
-    const domainOptions = [
+  setup() {
+    const domainOptions = ref<DomainOption[]>([
       {
         value: "cybersecurity",
         label: "Cybersecurity",
@@ -212,155 +144,104 @@ export default {
         iconHtml:
           '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" rx="4" fill="#ebf8ff"/><path d="M8 12h8M8 8h8M8 16h5" stroke="#0369a1" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
       }
-    ];
+    ]);
 
-    // inline SVG icons for provider tiles
-    const commProviders = [
-      {
-        value: "teams",
-        label: "Teams",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect x="2.5" y="4.5" width="7" height="7" rx="1.4" fill="#005A9C"/>' +
-          '<rect x="8.5" y="7.5" width="13" height="11" rx="2" fill="#2B88D8" opacity="0.95"/>' +
-          '<circle cx="6" cy="9.5" r="1.1" fill="#FFF" opacity="0.95"/>' +
-          '<path d="M9.5 8.75h7" stroke="#D6F0FF" stroke-width="0.9" stroke-linecap="round"/>' +
-          "</svg>"
-      },
-      {
-        value: "slack",
-        label: "Slack",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect x="4" y="2" width="4.5" height="10" rx="2.2" fill="#36C5F0"/>' +
-          '<rect x="15.5" y="2" width="4.5" height="10" rx="2.2" transform="rotate(90 15.5 2)" fill="#2EB67D"/>' +
-          '<rect x="4" y="12" width="4.5" height="10" rx="2.2" transform="rotate(90 4 12)" fill="#ECB22E"/>' +
-          '<rect x="15.5" y="12" width="4.5" height="10" rx="2.2" fill="#E01E5A"/>' +
-          "</svg>"
-      },
-      {
-        value: "none",
-        label: "None",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect width="24" height="24" rx="4" fill="#F3F4F6"/>' +
-          '<path d="M7 12h10" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>' +
-          "</svg>"
-      }
-    ];
+    const local = reactive({
+      organization: "",
+      location: "",
+      industry: ""
+    });
 
-    const pmProviders = [
-      {
-        value: "jira",
-        label: "Jira",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect width="24" height="24" rx="4" fill="#E6F6FF"/>' +
-          '<path d="M6 16l4-10 6 8-3 4-7-2z" fill="#0052CC"/>' +
-          '<path d="M16 14l2-2" stroke="#2684FF" stroke-width="0.8" stroke-linecap="round"/>' +
-          "</svg>"
-      },
-      {
-        value: "asana",
-        label: "Asana",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect width="24" height="24" rx="4" fill="#FFFBF7"/>' +
-          '<circle cx="9.2" cy="9.2" r="2.1" fill="#EC6A6A"/>' +
-          '<circle cx="14.8" cy="9.2" r="2.1" fill="#FFB56B"/>' +
-          '<circle cx="12" cy="14.5" r="2.1" fill="#7C5CFF"/>' +
-          "</svg>"
-      },
-      {
-        value: "none",
-        label: "None",
-        icon:
-          '<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' +
-          '<rect width="24" height="24" rx="4" fill="#F3F4F6"/>' +
-          '<path d="M7 12h10" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>' +
-          "</svg>"
-      }
-    ];
+    const selectedDomains = ref<string[]>([]);
+    const submitting = ref(false);
+    const showMattermost = ref(false);
+    const mm = reactive({ connecting: false, status: "pending" as "pending" | "connected" });
 
-    return {
-      local: {
-        organization: "",
-        location: "",
-        industry: ""
-      },
-      domainOptions,
-      selectedDomains: [],
-      commProviders,
-      pmProviders,
-      selectedComm: "",
-      selectedPM: "",
-      submitting: false,
-      showMattermost: false,
-      mm: { connecting: false, status: "pending" }
-    };
-  },
-  methods: {
-    isSelected(val) {
-      return this.selectedDomains.includes(val);
-    },
-    toggleDomain(val) {
+    // include the uploaded sketch path (local file path provided)
+    const sketchUrl = ref<string>("/mnt/data/e6ee10fe-3a83-45ee-b3a8-4a04b938dd67.png");
+
+    function isSelected(val: string) {
+      return selectedDomains.value.includes(val);
+    }
+
+    function toggleDomain(val: string) {
       if (val === "all") {
-        const hasAll = this.selectedDomains.includes("all");
-        if (hasAll) this.selectedDomains = [];
-        else this.selectedDomains = this.domainOptions.map((o) => o.value);
+        const hasAll = selectedDomains.value.includes("all");
+        if (hasAll) {
+          selectedDomains.value = [];
+        } else {
+          selectedDomains.value = domainOptions.value.map((o) => o.value);
+        }
         return;
       }
-      const idx = this.selectedDomains.indexOf(val);
-      if (idx === -1) this.selectedDomains.push(val);
-      else this.selectedDomains.splice(idx, 1);
+      const idx = selectedDomains.value.indexOf(val);
+      if (idx === -1) selectedDomains.value.push(val);
+      else selectedDomains.value.splice(idx, 1);
 
       // keep "all" in sync
-      const nonAll = this.domainOptions.filter((o) => o.value !== "all").map((o) => o.value);
-      const allSelected = nonAll.every((v) => this.selectedDomains.includes(v));
-      if (allSelected && !this.selectedDomains.includes("all")) this.selectedDomains.push("all");
-      if (!allSelected && this.selectedDomains.includes("all")) {
-        const i = this.selectedDomains.indexOf("all");
-        if (i !== -1) this.selectedDomains.splice(i, 1);
+      const nonAll = domainOptions.value.filter((o) => o.value !== "all").map((o) => o.value);
+      const allSelected = nonAll.every((v) => selectedDomains.value.includes(v));
+      if (allSelected && !selectedDomains.value.includes("all")) selectedDomains.value.push("all");
+      if (!allSelected && selectedDomains.value.includes("all")) {
+        const i = selectedDomains.value.indexOf("all");
+        if (i !== -1) selectedDomains.value.splice(i, 1);
       }
-    },
-    onFinish() {
-      if (!this.local.location) {
+    }
+
+    function onFinish() {
+      if (!local.location) {
         window.alert("Please select a country.");
         return;
       }
-      if (!this.local.industry) {
+      if (!local.industry) {
         window.alert("Please select an industry.");
         return;
       }
-      this.submitting = true;
+      submitting.value = true;
       setTimeout(() => {
-        this.submitting = false;
-        // show Mattermost panel and split card
-        this.showMattermost = true;
-        this.mm.status = "pending";
+        submitting.value = false;
+        showMattermost.value = true;
+        mm.status = "pending";
       }, 700);
-    },
-    resetForm() {
-      this.local.organization = "";
-      this.local.location = "";
-      this.local.industry = "";
-      this.selectedDomains = [];
-      this.selectedComm = "";
-      this.selectedPM = "";
-    },
-    connectToMattermost() {
-      if (this.mm.connecting) return;
-      this.mm.connecting = true;
-      setTimeout(() => {
-        this.mm.connecting = false;
-        this.mm.status = "connected";
-      }, 1200);
-    },
-    closeMattermost() {
-      this.showMattermost = false;
     }
+
+    function resetForm() {
+      local.organization = "";
+      local.location = "";
+      local.industry = "";
+      selectedDomains.value = [];
+    }
+
+    function connectToMattermost() {
+      if (mm.connecting) return;
+      mm.connecting = true;
+      setTimeout(() => {
+        mm.connecting = false;
+        mm.status = "connected";
+      }, 1200);
+    }
+
+    function closeMattermost() {
+      showMattermost.value = false;
+    }
+
+    return {
+      domainOptions,
+      local,
+      selectedDomains,
+      submitting,
+      showMattermost,
+      mm,
+      sketchUrl,
+      isSelected,
+      toggleDomain,
+      onFinish,
+      resetForm,
+      connectToMattermost,
+      closeMattermost
+    };
   }
-};
+});
 </script>
 
 <style scoped>
@@ -489,8 +370,6 @@ export default {
   display: flex;
   align-items: center;
   width: 90%;
-  /* gap: 14px; */
-  /* padding: 14px; */
   border-radius: 12px;
   border: 1px solid rgba(15, 23, 42, 0.06);
   background: rgba(255, 255, 255, 0.02);
@@ -508,7 +387,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* flex: 0 0 56px; */
 }
 
 .domain-title {
