@@ -1,4 +1,4 @@
-<template>
+i am telling u last time <template>
   <main class="locations-teams-page">
     <div class="container shell">
       <!-- header -->
@@ -134,6 +134,7 @@
                     <td class="role">{{ row.role }}</td>
 
                     <!-- Assign member -->
+                    <!-- Assign member -->
                     <td class="member-col">
                       <div class="member-control">
                         <div class="avatar" v-if="row.member" :title="row.member" aria-hidden="false">
@@ -146,31 +147,33 @@
                         </div>
 
                         <div class="member-inputs">
-                          <!-- input with datalist dropdown for suggestions -->
-                          <input :list="`members-datalist-${activeTab}-${rIdx}`" class="input" v-model="row.member"
-                            @input="(e: Event) => onMemberInput(activeTab, rIdx, (e.target as HTMLInputElement).value)"
-                            placeholder="Select or type member name" aria-label="Assign member" />
-                          <datalist :id="`members-datalist-${activeTab}-${rIdx}`">
-                            <option v-for="m in membersListForRow(row)" :key="m.name" :value="m.name">
-                              {{ m.email ?? '' }}
+                          <select class="select" v-model="row.assign"
+                            @change="onMemberInput(activeTab, rIdx, row.assign)" aria-label="Assign member">
+                            <!-- CORRECT PLACEHOLDER -->
+                            <option value="" disabled>Select member</option>
+
+                            <!-- FIXED DROPDOWN LIST -->
+                            <option v-for="m in membersStatic" :key="m.name" :value="m.name">
+                              {{ m.name }}
+                              <span v-if="m.email"> — {{ m.email }}</span>
                             </option>
-                          </datalist>
+                          </select>
 
                           <div v-if="row.email" class="muted tiny">{{ row.email }}</div>
                         </div>
                       </div>
                     </td>
 
+
                     <!-- Backup -->
                     <td>
-                      <input :list="`backup-datalist-${activeTab}-${rIdx}`" class="input" v-model="row.backup"
-                        @input="(e: Event) => onBackupInput(activeTab, rIdx, (e.target as HTMLInputElement).value)"
-                        placeholder="Select backup" aria-label="Backup member" />
-                      <datalist :id="`backup-datalist-${activeTab}-${rIdx}`">
-                        <option v-for="m in membersListForRow(row, { exclude: row.member })" :key="m.name"
-                          :value="m.name">
-                        </option>
-                      </datalist>
+
+                      <select class="select" v-model="row.backup" aria-label="backup">
+                        <option value="" disabled>Select location</option>
+                        <option v-for="back in backup" :key="back" :value="back">{{ back }}</option>
+                      </select>
+
+
                     </td>
 
                     <!-- Location select -->
@@ -214,8 +217,9 @@ type Member = { name: string; email?: string };
 type TeamRowStatic = {
   id: string;
   role: string;
-  member: string;
-  email?: string;
+  member: string;     // legacy — kept for compatibility
+  assign: string;    // newly used by your template
+  email: string;
   backup: string;
   location: string;
 };
@@ -236,7 +240,7 @@ export default defineComponent({
     const locMessage = ref("");
     const locMessageType = ref<"success" | "error">("success");
 
-    // Multi-select dropdown state
+    // Multi-select dropdown state (unchanged)
     const presets = ref<string[]>(["New York", "London", "Bengaluru", "Sydney", "Mumbai", "Delhi", "San Francisco"]);
     const selectedPresets = ref<string[]>([]);
     const dropdownCustom = ref<string>("");
@@ -256,23 +260,63 @@ export default defineComponent({
         id: uid("t-1"),
         name: "Team 1",
         rows: [
-          { id: uid("r-"), role: "Owner", member: "Amit Sharma", email: "amit@example.com", backup: "Sara Khan", location: "New York" },
-          { id: uid("r-"), role: "Analyst", member: "Diego Lopez", email: "diego@example.com", backup: "Lina Park", location: "Bengaluru" }
+          {
+            id: uid("r-"),
+            role: "Owner",
+            member: "Amit Sharma",
+            assign: "Amit Sharma", // sync assign with member for template
+            email: "amit@example.com",
+            backup: "Sara Khan",
+            location: "New York"
+          },
+          {
+            id: uid("r-"),
+            role: "Analyst",
+            member: "Diego Lopez",
+            assign: "Diego Lopez",
+            email: "diego@example.com",
+            backup: "Lina Park",
+            location: "Bengaluru"
+          }
         ]
       },
       {
         id: uid("t-2"),
         name: "Team 2",
         rows: [
-          { id: uid("r-"), role: "Manager", member: "Sara Khan", email: "sara@example.com", backup: "Amit Sharma", location: "London" },
-          { id: uid("r-"), role: "Operator", member: "Lina Park", email: "lina@example.com", backup: "Diego Lopez", location: "Sydney" }
+          {
+            id: uid("r-"),
+            role: "Manager",
+            member: "Sara Khan",
+            assign: "Sara Khan",
+            email: "sara@example.com",
+            backup: "Amit Sharma",
+            location: "London"
+          },
+          {
+            id: uid("r-"),
+            role: "Operator",
+            member: "Lina Park",
+            assign: "Lina Park",
+            email: "lina@example.com",
+            backup: "Diego Lopez",
+            location: "Sydney"
+          }
         ]
       },
       {
         id: uid("t-3"),
         name: "Team 3",
         rows: [
-          { id: uid("r-"), role: "Admin", member: "Diego Lopez", email: "diego@example.com", backup: "Sara Khan", location: "New York" }
+          {
+            id: uid("r-"),
+            role: "Admin",
+            member: "Diego Lopez",
+            assign: "Diego Lopez",
+            email: "diego@example.com",
+            backup: "Sara Khan",
+            location: "New York"
+          }
         ]
       }
     ]);
@@ -284,6 +328,9 @@ export default defineComponent({
       { name: "Sara Khan", email: "sara@example.com" },
       { name: "Lina Park", email: "lina@example.com" }
     ]);
+
+    // Create a simple 'backup' array of names used by your template v-for="back in backup"
+    const backup = computed(() => membersStatic.value.map((m) => m.name));
 
     // SAFE computed values (never undefined)
     const safeCurrentTab = computed(() => {
@@ -428,6 +475,7 @@ export default defineComponent({
 
       // Reset requested fields (keep role and id)
       row.member = "";
+      row.assign = "";
       row.email = "";
       row.backup = "";
       row.location = "";
@@ -446,10 +494,18 @@ export default defineComponent({
     function addEmptyRow() {
       const t = teams.value[activeTab.value];
       if (!t) return;
-      t.rows.push({ id: uid("r-"), role: "New role", member: "", email: "", backup: "", location: locations.value[0] ?? "" });
+      t.rows.push({
+        id: uid("r-"),
+        role: "New role",
+        member: "",
+        assign: "",
+        email: "",
+        backup: "",
+        location: locations.value[0] ?? ""
+      });
     }
 
-    // utilities for members
+    // utilities for members (defensive)
     function membersListForRow(row: TeamRowStatic, opts?: { exclude?: string }): Member[] {
       const excludeName = opts?.exclude ?? "";
       const all: Member[] = [...membersStatic.value];
@@ -461,14 +517,17 @@ export default defineComponent({
         all.push({ name: row.backup });
       }
 
-      return all.filter((m) => m.name !== excludeName);
+      return all.filter((m) => m && m.name && m.name !== excludeName);
     }
 
+    // when assign selection changes, keep member & email in sync (optional)
     function onMemberInput(teamIndex: number, rowIndex: number, value: string) {
       const team = teams.value[teamIndex];
       if (!team) return;
       const row = team.rows[rowIndex];
       if (!row) return;
+      // update both assign and member so older code still works
+      row.assign = value;
       row.member = value;
       const found = membersStatic.value.find((m) => m.name === value);
       row.email = found?.email ?? "";
@@ -531,6 +590,8 @@ export default defineComponent({
       onMemberInput,
       onBackupInput,
       initials,
+      // backup array for template
+      backup,
       // CTA
       showThreatCTA,
       goToThreatProfile
@@ -538,6 +599,7 @@ export default defineComponent({
   }
 });
 </script>
+
 
 <style scoped>
 /* full CSS styling (keeps the polished look) */

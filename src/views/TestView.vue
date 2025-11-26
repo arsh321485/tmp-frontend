@@ -134,7 +134,7 @@
 
                     <div class="status-body">
                       <div class="status-title">Status: <span class="status-strong">{{ mm.status === 'pending' ?
-                          'Pending' : 'Connected' }}</span></div>
+                        'Pending' : 'Connected' }}</span></div>
                       <div class="status-sub small text-muted">
                         <template v-if="mm.status === 'pending'">
                           You haven't set up your email with Mattermost yet.
