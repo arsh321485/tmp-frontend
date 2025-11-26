@@ -155,7 +155,7 @@ i am telling u last time <template>
                             <!-- FIXED DROPDOWN LIST -->
                             <option v-for="m in membersStatic" :key="m.name" :value="m.name">
                               {{ m.name }}
-                              <span v-if="m.email"> — {{ m.email }}</span>
+
                             </option>
                           </select>
 
