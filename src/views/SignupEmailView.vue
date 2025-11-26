@@ -212,14 +212,16 @@ export default defineComponent({
         this.tried = false;
         this.showPassword = false;
 
-        // navigate to next step (email verification/instructions)
-        const target = { path: "/emailauth", query: { email: emailToSend } };
+        // navigate to next step (email onboarding)
+        const target = { path: "/email-onboarding", query: { email: emailToSend } };
 
         const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
         if (maybeRouter && typeof maybeRouter.push === "function") {
+          // prefer named/clean client-side navigation
           await maybeRouter.push(target);
         } else {
-          window.location.href = `/emailauth?email=${encodeURIComponent(emailToSend)}`;
+          // fallback (full page navigate) — preserve query param
+          window.location.href = `/email-onboarding?email=${encodeURIComponent(emailToSend)}`;
         }
       } catch (err: unknown) {
         if (err instanceof Error) {

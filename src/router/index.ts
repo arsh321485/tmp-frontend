@@ -58,7 +58,7 @@ const router = createRouter({
       component: MattermostView
     },
     {
-      path: '/login',
+      path: '/login1',
       name: 'login',
       component: LoginView
     },

@@ -6,7 +6,7 @@
         <div class="d-flex align-items-center gap-3">
           <div class="logo-placeholder" aria-hidden="true"></div>
           <div>
-            <h3 class="mb-0">TMP</h3>
+            <h3 class="mb-0 " style=" color: #03318d; ">TMP</h3>
             <small class="text-muted">Manage locations & teams</small>
           </div>
         </div>
