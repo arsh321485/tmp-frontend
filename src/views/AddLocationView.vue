@@ -21,6 +21,11 @@
             Save
           </button>
 
+          <!-- GO TO THREAT PROFILE appears after save -->
+          <button v-if="showThreatCTA" class="btn btn-success" @click="goToThreatProfile" title="Go to Threat Profile">
+            Go to Threat Profile
+          </button>
+
           <!-- moved + add-row button here -->
           <button class="btn btn-add" @click="addEmptyRow" title="Add team row">
             <svg viewBox="0 0 24 24" class="add-icon" xmlns="http://www.w3.org/2000/svg">
@@ -40,9 +45,8 @@
                 once.</p>
             </div>
 
-            <!-- MULTI-SELECT DROPDOWN (single source for adding) -->
+            <!-- MULTI-SELECT DROPDOWN -->
             <div class="row input-row" ref="multiWrapRef">
-              <!-- Multi-select dropdown -->
               <div class="multi-col">
                 <button class="multi-trigger" @click="toggleDropdown" :aria-expanded="dropdownOpen">
                   <template v-if="selectedPresets.length">
@@ -81,7 +85,6 @@
                 </div>
               </div>
 
-              <!-- info placeholder (keeps layout neat) -->
               <div class="info-col muted">Select multiple presets or type customs in dropdown</div>
             </div>
 
@@ -133,7 +136,6 @@
                     <!-- Assign member -->
                     <td class="member-col">
                       <div class="member-control">
-                        <!-- avatar now shows neutral user icon, not initials -->
                         <div class="avatar" v-if="row.member" :title="row.member" aria-hidden="false">
                           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg"
                             aria-hidden="true">
@@ -144,13 +146,14 @@
                         </div>
 
                         <div class="member-inputs">
-                          <!-- event target cast to HTMLInputElement to satisfy TS -->
+                          <!-- input with datalist dropdown for suggestions -->
                           <input :list="`members-datalist-${activeTab}-${rIdx}`" class="input" v-model="row.member"
                             @input="(e: Event) => onMemberInput(activeTab, rIdx, (e.target as HTMLInputElement).value)"
                             placeholder="Select or type member name" aria-label="Assign member" />
                           <datalist :id="`members-datalist-${activeTab}-${rIdx}`">
-                            <option v-for="m in membersListForRow(row)" :key="m.name" :value="m.name">{{ m.email ?? ''
-                            }}</option>
+                            <option v-for="m in membersListForRow(row)" :key="m.name" :value="m.name">
+                              {{ m.email ?? '' }}
+                            </option>
                           </datalist>
 
                           <div v-if="row.email" class="muted tiny">{{ row.email }}</div>
@@ -170,11 +173,18 @@
                       </datalist>
                     </td>
 
-                    <td class="loc">{{ row.location }}</td>
+                    <!-- Location select -->
+                    <td>
+                      <select class="select" v-model="row.location" aria-label="Location">
+                        <option value="" disabled>Select location</option>
+                        <option v-for="loc in locations" :key="loc" :value="loc">{{ loc }}</option>
+                      </select>
+                    </td>
 
                     <td class="actions-col">
-                      <button class="btn btn-danger outline" @click="removeTeamRow(activeTab, rIdx)" title="Remove row">
-                        Remove
+                      <!-- CLEAR resets the row (Assign, Backup, Location) WITHOUT removing the row -->
+                      <button class="btn btn-danger outline" @click="clearTeamRow(activeTab, rIdx)" title="Clear row">
+                        Clear
                       </button>
                     </td>
                   </tr>
@@ -196,6 +206,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router";
 import type { Ref } from "vue";
 
 /* Types */
@@ -217,6 +228,8 @@ function uid(prefix = "") {
 export default defineComponent({
   name: "LocationsTeamsMultiAddOnly",
   setup() {
+    const router = useRouter();
+
     // Locations
     const locations = ref<string[]>([]);
     const saving = ref(false);
@@ -272,7 +285,7 @@ export default defineComponent({
       { name: "Lina Park", email: "lina@example.com" }
     ]);
 
-    // SAFE computed values (never undefined) — fixes VLS warning
+    // SAFE computed values (never undefined)
     const safeCurrentTab = computed(() => {
       return teamTabs.value[activeTab.value] ?? teamTabs.value[0] ?? { key: "team-fallback", label: "" };
     });
@@ -283,6 +296,9 @@ export default defineComponent({
 
     const teamMessage = ref("");
     const teamMessageType = ref<"success" | "error">("success");
+
+    // CTA flag shown after save
+    const showThreatCTA = ref(false);
 
     // load locations
     function loadFromStorage() {
@@ -388,6 +404,10 @@ export default defineComponent({
         saving.value = false;
         locMessageType.value = "success";
         locMessage.value = "Locations saved.";
+
+        // show the CTA button after successful save
+        showThreatCTA.value = true;
+
         setTimeout(() => (locMessage.value = ""), 2000);
       }, 600);
     }
@@ -399,16 +419,30 @@ export default defineComponent({
       setTimeout(() => (locMessage.value = ""), 2000);
     }
 
-    // team row handling
-    function removeTeamRow(teamIndex: number, rowIndex: number) {
+    // clear row (reset fields but keep row)
+    function clearTeamRow(teamIndex: number, rowIndex: number) {
       const team = teams.value[teamIndex];
       if (!team) return;
-      team.rows.splice(rowIndex, 1);
+      const row = team.rows[rowIndex];
+      if (!row) return;
+
+      // Reset requested fields (keep role and id)
+      row.member = "";
+      row.email = "";
+      row.backup = "";
+      row.location = "";
+
+      // Optionally clear dropdown selection to avoid accidental reuse
+      selectedPresets.value = [];
+      dropdownCustom.value = "";
+      dropdownOpen.value = false;
+
       teamMessageType.value = "success";
-      teamMessage.value = `Member removed from ${teamTabs.value[teamIndex]?.label ?? "Team"}.`;
+      teamMessage.value = `Row reset for ${teamTabs.value[teamIndex]?.label ?? "Team"}.`;
       setTimeout(() => (teamMessage.value = ""), 1600);
     }
 
+    // team row handling
     function addEmptyRow() {
       const t = teams.value[activeTab.value];
       if (!t) return;
@@ -449,7 +483,12 @@ export default defineComponent({
       row.backup = value;
     }
 
-    // helper for initials (still available if you want initials elsewhere)
+    // CTA navigation
+    function goToThreatProfile() {
+      router.push("/threat-profile").catch(() => { });
+    }
+
+    // helper for initials
     function initials(name?: string) {
       if (!name) return "";
       const parts = name.trim().split(/\s+/).slice(0, 2);
@@ -482,7 +521,7 @@ export default defineComponent({
       teams,
       safeCurrentTab,
       safeCurrentTeam,
-      removeTeamRow,
+      clearTeamRow,
       addEmptyRow,
       teamMessage,
       teamMessageType,
@@ -491,7 +530,10 @@ export default defineComponent({
       membersListForRow,
       onMemberInput,
       onBackupInput,
-      initials
+      initials,
+      // CTA
+      showThreatCTA,
+      goToThreatProfile
     };
   }
 });

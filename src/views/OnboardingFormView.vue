@@ -23,7 +23,7 @@
                 <!-- welcome centered -->
                 <div class="text-center se-labels mb-4">
                   <h2 class="se-main">Welcome to Test My Plan</h2>
-                  <p class="se-sub">BGet started with your incident preparedness...</p>
+                  <p class="se-sub">Get started with your incident preparedness...</p>
                 </div>
 
                 <!-- Add organization heading -->
