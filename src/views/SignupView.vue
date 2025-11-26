@@ -74,8 +74,7 @@
 
                   <!-- Mobile: full-width button (visible below md) -->
                   <div class=" d-md-none mt-3">
-                    <a href="/signup-email" class=" w-100  small">I dont have any of
-                      these</a>
+                    <router-link to="/signup-email" class="se-email-link">I don't have any of these</router-link>
                   </div>
 
                 </div>
