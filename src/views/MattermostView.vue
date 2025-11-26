@@ -14,7 +14,10 @@
                 <!-- top row: logo and TMP in left corner -->
                 <div class="d-flex align-items-center gap-2 mb-3">
                   <div class="logo-placeholder se-labels" aria-hidden="true"></div>
-                  <h3 class="mb-0 logo-text " style=" color: #03318d;;">TMP</h3>
+                  <div class="brand-mark">TMP</div>
+                  <div class="brand-text">
+                    <h1>TestMyPlan</h1>
+                  </div>
                 </div>
 
                 <!-- welcome centered -->
@@ -205,6 +208,26 @@ export default {
 
 <style scoped>
 /* keep your existing styles and only add centering / modal rules */
+.brand-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #0b59d1, #054cb3);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 10px 30px rgba(11, 59, 209, 0.12);
+  font-family: Inter, sans-serif;
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 1rem;
+  color: #06307a;
+  font-weight: 800;
+}
 
 /* card (base styles are in your main css) */
 .se-card {

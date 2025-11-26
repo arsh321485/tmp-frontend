@@ -69,7 +69,7 @@
 
                   <!-- Desktop: underline link (visible md and up) -->
                   <div class="text-center mt-3 d-none d-md-block">
-                    <a href="/signup-email" class="se-email-link">I dont have any of these</a>
+                    <router-link to="/signup-email" class="se-email-link">I don't have any of these</router-link>
                   </div>
 
                   <!-- Mobile: full-width button (visible below md) -->

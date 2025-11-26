@@ -87,4 +87,18 @@ const router = createRouter({
   ],
 })
 
+// main.ts (put this near the top, before `createApp(...)` and before mounting)
+if (typeof window !== 'undefined') {
+  // If the app was loaded from a non-root pathname AND the URL already has a hash route,
+  // move the hash route to root so final URL becomes "/#/..." instead of "/somepath#/..."
+  const { pathname, hash } = window.location;
+  if (pathname !== '/' && hash && hash.startsWith('#/')) {
+    // e.g. /signup-email#/onboarding?provider=teams  -->  /#/onboarding?provider=teams
+    const newUrl = `/${hash}`; // includes leading '#'
+    // Use replaceState so it doesn't reload the page
+    window.history.replaceState({}, '', newUrl);
+    // location now: pathname === '/' and hash preserved
+  }
+}
+
 export default router
