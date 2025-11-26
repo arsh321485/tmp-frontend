@@ -66,12 +66,13 @@
 
                 <!-- finish button aligned right corner -->
                 <div class="d-flex justify-content-end mt-4">
-                  <button class="btn finish-btn" @click="onFinish" :disabled="submitting" aria-busy="submitting">
+                  <button class="btn finish-btn" @click="onFinish" :disabled="submitting" :aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
                     Finish
                   </button>
                 </div>
+
 
               </div>
             </aside>

@@ -67,6 +67,8 @@
 </template>
 
 <script lang="ts">
+import type { Router } from "vue-router";
+
 export default {
   name: "ForgotPasswordThemeA",
   data() {
@@ -80,7 +82,7 @@ export default {
     };
   },
   methods: {
-    validateEmail() {
+    validateEmail(): boolean {
       this.emailError = "";
       if (!this.email) {
         this.emailError = "Email is required";
@@ -101,11 +103,13 @@ export default {
       this.sending = true;
       try {
         // TODO: replace with your API call, e.g. axios.post('/api/auth/forgot-password', { email: this.email })
-        await new Promise((r) => setTimeout(r, 900)); // demo delay
+        await new Promise<void>((resolve) => setTimeout(resolve, 900)); // demo delay
 
-        this.message = "If this email exists, we've sent password reset instructions. Check your inbox.";
+        this.message =
+          "If this email exists, we've sent password reset instructions. Check your inbox.";
         this.messageClass = "text-success";
-      } catch (err: any) {
+      } catch {
+        // no need to inspect the error here — keep lint clean
         this.message = "Unable to send reset email. Please try again later.";
         this.messageClass = "text-danger";
       } finally {
@@ -114,15 +118,17 @@ export default {
     },
 
     goToSignin() {
-      if ((this as any).$router) {
-        (this as any).$router.push({ path: "/signin" });
-        return;
+      const router = (this as unknown as { $router?: Router }).$router;
+      if (router) {
+        router.push({ path: "/signin" });
+      } else {
+        window.location.href = "/signin";
       }
-      window.location.href = "/signin";
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* THEME A: card shell + left image + right panel styles (matches your Signup layout) */

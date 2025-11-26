@@ -125,3 +125,249 @@ export default defineComponent({
   }
 });
 </script>
+<style>
+/* Page background */
+.se-page {
+  background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
+}
+
+/* Card container spacing to match screenshot */
+.se-card-col {
+  padding: 48px 10px;
+}
+
+/* Card style */
+.se-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(11, 42, 102, 0.06);
+  box-shadow: 0 8px 30px rgba(18, 38, 84, 0.06);
+  min-height: 560px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* LEFT image panel */
+.se-left {
+  width: 52%;
+  min-height: 560px;
+  position: relative;
+  padding: 0;
+  /* background: #061333; */
+}
+
+.se-left-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(0.98);
+}
+
+/* overlay text */
+.se-left-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  pointer-events: none;
+  padding: 24px;
+}
+
+.se-left-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+.se-left-sub {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+}
+
+/* DATA PROTECTION pill */
+.se-data-protection {
+  margin-top: 60px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #c7ffff;
+}
+
+/* RIGHT panel */
+.se-right {
+  width: 48%;
+  padding: 40px 56px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+}
+
+.se-right-inner {
+  width: 100%;
+}
+
+/* header row increased gap so providers sit lower */
+.se-header-row {
+  margin-bottom: 24px;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* sign-in link style */
+.tmp-signin-link {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.tmp-signin-link:hover {
+  color: #03318d;
+  text-decoration: underline;
+}
+
+/* header/title */
+.se-title {
+  color: #03318d;
+  font-weight: 700;
+}
+
+/* providers list */
+.se-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-items: stretch;
+  margin-top: 0;
+}
+
+/* provider row */
+.se-provider {
+  background: #fff;
+  border: 1px solid rgba(11, 42, 102, 0.06);
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.se-provider:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 34px rgba(9, 30, 66, 0.06);
+}
+
+/* icon pill */
+.se-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #f5f7fa, #ebf1f9);
+}
+
+.se-icon img {
+  width: 18px;
+  height: 18px;
+  filter: brightness(0) saturate(100%) invert(10%) sepia(90%) saturate(3000%) hue-rotate(205deg) brightness(80%) contrast(105%);
+}
+
+/* labels */
+.se-labels .se-main {
+  font-weight: 600;
+  color: #03318d;
+}
+
+.se-labels .se-sub {
+  color: #687388;
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* arrow */
+.se-arrow {
+  margin-left: auto;
+  color: rgba(11, 42, 102, 0.18);
+  font-size: 22px;
+}
+
+/* email link and terms */
+.se-email-link {
+  color: #6c6c6c;
+  text-decoration: underline;
+}
+
+/* mobile button styling override (keeps bootstrap btn styles) */
+.se-email-btn {
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+  color: #03318d;
+}
+
+/* Responsive: hide left panel on md and below; reduce paddings so no big bottom gap */
+@media (max-width: 991.98px) {
+  .se-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .se-left {
+    display: none !important;
+  }
+
+  .se-right {
+    width: 100%;
+    padding: 28px 20px;
+  }
+
+  .se-card-col {
+    padding: 24px 10px;
+  }
+
+  .se-data-protection {
+    display: none;
+  }
+
+  .se-left-title {
+    font-size: 20px;
+  }
+
+  .se-header-row {
+    margin-bottom: 18px;
+  }
+
+  /* on small screens make provider buttons slightly taller for touch */
+  .se-provider {
+    padding: 16px 18px;
+  }
+
+  .se-provider .se-main {
+    font-size: 1rem;
+  }
+
+  .se-provider .se-sub {
+    font-size: 0.85rem;
+  }
+}
+
+/* Very large screens: cap width so card doesn't become extremely wide */
+@media (min-width: 1600px) {
+  .se-card {
+    max-width: 1200px;
+  }
+}
+</style>

@@ -84,7 +84,7 @@
 
           <!-- Team panel -->
           <section class="team-panel">
-            <h5 class="mb-3">{{ teamTabs[activeTab].label }}</h5>
+            <h5 class="mb-3">{{ currentTab.label }}</h5>
 
             <div class="table-responsive">
               <table class="table table-borderless align-middle custom-table">
@@ -98,7 +98,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(row, rIdx) in teams[activeTab].rows" :key="row.id">
+                  <tr v-for="(row, rIdx) in currentTeam.rows" :key="row.id">
                     <td>
                       <div class="cell-text">{{ row.role }}</div>
                     </td>
@@ -119,7 +119,7 @@
                     </td>
                   </tr>
 
-                  <tr v-if="!teams[activeTab].rows.length">
+                  <tr v-if="!currentTeam.rows.length">
                     <td colspan="5" class="text-muted text-center py-4">No members configured for this team.</td>
                   </tr>
                 </tbody>
@@ -138,7 +138,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 
 type TeamRowStatic = {
   id: string;
@@ -204,6 +204,16 @@ export default defineComponent({
       }
     ]);
 
+    // Computed safe accessors (avoid 'possibly undefined' errors)
+    const currentTab = computed(() => {
+      // return a guaranteed object (fallback to first tab shape)
+      return teamTabs.value[activeTab.value] ?? teamTabs.value[0] ?? { key: "team1", label: "Team 1" };
+    });
+
+    const currentTeam = computed<TeamStatic>(() => {
+      return teams.value[activeTab.value] ?? teams.value[0] ?? { id: "t-fallback", name: "Team 1", rows: [] };
+    });
+
     const teamMessage = ref<string>("");
     const teamMessageType = ref<"success" | "error">("success");
 
@@ -222,7 +232,7 @@ export default defineComponent({
       loadFromStorage();
     });
 
-    // Locations handlers
+    // Locations handlers (unchanged)...
     function addLocation() {
       locMessage.value = "";
       const value = (customLocation.value || preset.value || "").trim();
@@ -280,7 +290,7 @@ export default defineComponent({
       if (!team) return;
       team.rows.splice(rowIndex, 1);
       teamMessageType.value = "success";
-      teamMessage.value = `Member removed from ${teamTabs.value[teamIndex].label}.`;
+      teamMessage.value = `Member removed from ${teamTabs.value[teamIndex]?.label ?? "Team"}.`;
       setTimeout(() => (teamMessage.value = ""), 1800);
     }
 
@@ -302,6 +312,8 @@ export default defineComponent({
       teamTabs,
       activeTab,
       teams,
+      currentTab,
+      currentTeam,
       removeTeamRow,
       teamMessage,
       teamMessageType
@@ -309,6 +321,7 @@ export default defineComponent({
   }
 });
 </script>
+
 
 <style scoped>
 /* page basics */

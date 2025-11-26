@@ -110,12 +110,14 @@
 </template>
 
 <script lang="ts">
+import type { Router } from "vue-router";
+
 export default {
   name: "VerifyEmailThemeFrontendOnly",
   data() {
     return {
-      view: "loading", // 'loading' | 'success' | 'fail'
-      mode: "init", // 'init' | 'resend'
+      view: "loading" as "loading" | "success" | "fail",
+      mode: "init" as "init" | "resend",
       failMessage: "Verification token is invalid or expired.",
       resendEmail: "",
       tried: false,
@@ -133,7 +135,7 @@ export default {
 
     // 1) explicit preview control via ?status=
     if (status === "success" || status === "fail" || status === "loading") {
-      this.view = status;
+      this.view = status as "loading" | "success" | "fail";
       if (status === "fail" && params.get("msg")) {
         this.failMessage = params.get("msg")!;
       }
@@ -187,17 +189,27 @@ export default {
     },
 
     goToSignin() {
-      if ((this as any).$router) (this as any).$router.push({ path: "/signin" });
-      else window.location.href = "/signin";
+      // Prefer typed router if available, otherwise fallback to location
+      const router = (this as unknown as { $router?: Router }).$router;
+      if (router) {
+        router.push({ path: "/signin" });
+      } else {
+        window.location.href = "/signin";
+      }
     },
 
     goHome() {
-      if ((this as any).$router) (this as any).$router.push({ path: "/" });
-      else window.location.href = "/";
+      const router = (this as unknown as { $router?: Router }).$router;
+      if (router) {
+        router.push({ path: "/" });
+      } else {
+        window.location.href = "/";
+      }
     }
   }
 };
 </script>
+
 
 <style scoped>
 /* THEME A — card shell + left image + right panel */

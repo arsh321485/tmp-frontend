@@ -214,7 +214,7 @@ export default defineComponent({
       }
 
       // emit current domains (named update:domains)
-      this.$emit("update:domains", [...this.selectedDomains]);
+      // this.$emit("update:domains", [...this.selectedDomains]);
     },
 
     onFinish(this: { local: LocalState; selectedDomains: string[]; submitting: boolean }): void {
@@ -228,15 +228,15 @@ export default defineComponent({
       }
 
       this.submitting = true;
-      setTimeout(() => {
-        this.submitting = false;
-        this.$emit("submit", {
-          organization: this.local.organization,
-          location: this.local.location,
-          industry: this.local.industry,
-          domains: [...this.selectedDomains]
-        });
-      }, 700);
+      // setTimeout(() => {
+      //   this.submitting = false;
+      //   this.$emit("submit", {
+      //     organization: this.local.organization,
+      //     location: this.local.location,
+      //     industry: this.local.industry,
+      //     domains: [...this.selectedDomains]
+      //   });
+      // }, 700);
     }
   }
 });

@@ -1,5 +1,5 @@
 <template>
-  <main class="split-signup min-vh-100 d-flex align-items-stretch">
+  <main class="split-signup min-vh-100 d-flex align-items-center justify-content-center">
     <div class="container-fluid px-0">
       <div class="row gx-0 justify-content-center">
 
@@ -23,7 +23,7 @@
             <!-- RIGHT: email signup form (Theme A panel) -->
             <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
               <!-- inner card area to control width & spacing -->
-              <div class="right-card w-100" style="max-width: 520px; min-height:72vh;">
+              <div class="right-card w-100">
                 <div class="mb-3">
                   <h4 class="title mb-0">Sign up with Email</h4>
                   <small class="text-muted">Complete the details below to create your account</small>
@@ -85,10 +85,10 @@
 
                   <!-- Submit -->
                   <div class="d-grid mb-3">
-                    <button class="btn btn-dark btn-md" :disabled="submitting">
+                    <button class="btn btn-dark btn-md" type="submit" :disabled="submitting">
                       <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                         aria-hidden="true"></span>
-                      <a href="/email-onboarding" class="text-white text-decoration-none">Create account</a>
+                      Create account
                     </button>
                   </div>
 
@@ -121,7 +121,7 @@ interface SignupForm {
 
 /** Minimal typed shape for router we use (avoid 'any') */
 interface RouterLike {
-  push(location: { path: string; query?: Record<string, string> }): Promise<void> | void;
+  push(location: { path: string; query?: Record<string, string> } | string): Promise<void> | void;
 }
 
 export default defineComponent({
@@ -198,8 +198,7 @@ export default defineComponent({
 
       this.submitting = true;
       try {
-        // NO API integration here — we'll wire this up later.
-        // A short delay simulates network so UI shows loading state.
+        // simulate network delay
         await new Promise((r) => setTimeout(r, 800));
 
         this.message = "Account created — check your email for verification.";
@@ -214,20 +213,15 @@ export default defineComponent({
         this.showPassword = false;
 
         // navigate to next step (email verification/instructions)
-        // Use a typed router guard to avoid 'any' casts.
         const target = { path: "/emailauth", query: { email: emailToSend } };
 
-        // Cast through unknown to safely assert the shape without 'any'
         const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
         if (maybeRouter && typeof maybeRouter.push === "function") {
-          // Router push might return a Promise or void based on router implementation
           await maybeRouter.push(target);
         } else {
-          // Fallback to window navigation when no router is present
           window.location.href = `/emailauth?email=${encodeURIComponent(emailToSend)}`;
         }
       } catch (err: unknown) {
-        // Generic safe error handling (no axios)
         if (err instanceof Error) {
           this.message = err.message || "Unable to create account. Try again.";
         } else {
@@ -251,43 +245,47 @@ export default defineComponent({
 });
 </script>
 
-
-
 <style scoped>
-/* THEME A: card shell + left image + right panel styles */
+/* Match visual style & sizing from the providers page */
 
-/* container background retained outside card if desired */
+/* page background */
 .split-signup {
   background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
   padding: 32px 12px;
 }
 
-/* centered card shell */
+/* card shell styled like providers page */
 .card-shell {
   display: flex;
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
-  box-shadow: 0 12px 40px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 30px rgba(18, 38, 84, 0.06);
   border: 1px solid rgba(11, 42, 102, 0.06);
+  min-height: 560px;
+  max-width: 1000px;
+  margin: auto;
+  /* centered vertically & horizontally inside the full-height container */
 }
 
-/* left image area */
+/* LEFT image panel - same width as providers page */
 .left-image-panel {
+  width: 52%;
+  min-height: 560px;
   position: relative;
   padding: 0;
-  min-height: 520px;
-  overflow: hidden;
 }
 
+.left-image-wrapper,
 .left-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: saturate(1.04) contrast(0.98);
+  filter: saturate(1.05) contrast(0.98);
 }
 
+/* gradient overlay to improve readability of overlay text */
 .left-gradient {
   position: absolute;
   inset: 0;
@@ -295,6 +293,7 @@ export default defineComponent({
   pointer-events: none;
 }
 
+/* overlay text centered */
 .left-overlay-text {
   position: absolute;
   inset: 0;
@@ -320,29 +319,40 @@ export default defineComponent({
   color: rgba(255, 255, 255, 0.95);
 }
 
-/* right panel */
+/* RIGHT panel proportions and padding to match providers page */
 .right-panel {
-  background: #ffffff;
+  width: 48%;
+  padding: 40px 56px;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-left: 40px;
-  padding-right: 40px;
 }
 
-/* inner card where form lives */
+/* constrain the form area to be narrower like providers page */
 .right-card {
+  max-width: 420px;
+  /* MATCHED: narrower card similar to providers layout */
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   padding-top: 6px;
   padding-bottom: 18px;
 }
 
-/* page title color */
+/* Titles & small text styling */
 .title {
   color: #03318d;
   font-weight: 700;
 }
 
-/* small form tweaks */
+.text-muted {
+  color: #6b7280 !important;
+}
+
+/* form control appearance consistent with provider page */
 .form-control {
   font-size: 0.93rem;
   padding: 0.44rem 0.6rem;
@@ -362,7 +372,7 @@ export default defineComponent({
   border-radius: 8px;
 }
 
-/* primary dark button */
+/* dark primary button like provider page */
 .btn-dark {
   background: #03318d;
   border: none;
@@ -371,30 +381,45 @@ export default defineComponent({
   padding: 10px 14px;
 }
 
-/* small helper text color */
-.text-muted {
-  color: #6b7280 !important;
-}
-
-/* invalid feedback smaller */
+/* invalid feedback */
 .invalid-feedback.small {
   font-size: 0.82rem;
 }
 
-/* responsive: stack on small screens */
+/* make sure icon/button spacing looks right */
+.input-group .btn-icon {
+  border-left: 1px solid #e6e9ec;
+}
+
+/* Responsive: hide left artwork on narrower screens */
 @media (max-width: 991.98px) {
   .card-shell {
-    flex-direction: column-reverse;
+    flex-direction: column;
+    min-height: auto;
+    margin: 28px auto;
+    max-width: 92%;
   }
 
   .left-image-panel {
     display: none;
   }
 
+  .right-panel {
+    width: 100%;
+    padding: 28px 20px;
+  }
+
   .right-card {
     padding-left: 20px;
     padding-right: 20px;
     min-height: 60vh;
+  }
+}
+
+/* Very large screens: cap width so card doesn't become extremely wide */
+@media (min-width: 1600px) {
+  .card-shell {
+    max-width: 1200px;
   }
 }
 </style>
