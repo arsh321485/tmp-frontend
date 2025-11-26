@@ -36,7 +36,7 @@
 
                     <div class="mb-3 d-flex gap-2">
                       <!-- clicking opens modal -->
-                      <button class="btn btn-primary" :disabled="mm.connecting || mm.status === 'connected'"
+                      <button class="btn finish-btn" :disabled="mm.connecting || mm.status === 'connected'"
                         @click="openModal">
                         <span v-if="mm.connecting" class="spinner-border spinner-border-sm me-2" role="status"
                           aria-hidden="true"></span>
