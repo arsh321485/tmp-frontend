@@ -75,7 +75,16 @@
                   <div class="domains-grid">
                     <label v-for="opt in domainOptions" :key="opt.value" class="domain-card"
                       :class="{ selected: isSelected(opt.value) }" @click="toggleDomain(opt.value)" tabindex="0"
-                      @keydown.enter.prevent="toggleDomain(opt.value)">
+                      @keydown.enter.prevent="toggleDomain(opt.value)" role="checkbox"
+                      :aria-checked="isSelected(opt.value)">
+                      <!-- check badge (top-right) -->
+                      <span class="domain-check" aria-hidden="true" v-if="isSelected(opt.value)">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        </svg>
+                      </span>
+
                       <div class="domain-icon" v-html="opt.iconHtml"></div>
                       <div class="domain-body">
                         <div class="domain-title" style="color: #03318d;">{{ opt.label }}</div>
@@ -87,14 +96,11 @@
 
                 <!-- finish button aligned right corner -->
                 <div class="d-flex justify-content-end">
-                  <!-- use :aria-busy to bind the boolean, not a literal string -->
                   <button class="btn finish-btn" @click="onFinish" :disabled="submitting" :aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
-                    <!-- <a href="/mattermost" class="text-white text-decoration-none"> Connect to mattermost</a> -->
                     Connect to mattermost
                   </button>
-
                 </div>
 
               </div>
@@ -109,7 +115,6 @@
 <script lang="ts">
 import { defineComponent, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
-
 
 type DomainOption = {
   value: string;
@@ -207,12 +212,7 @@ export default defineComponent({
       submitting.value = true;
       setTimeout(() => {
         submitting.value = false;
-
-        // showMattermost.value = true;
-        // mm.status = "pending";
-        router.push("/mattermost").catch(() => {
-          // ignore navigation errors (like same route)
-        });
+        router.push("/mattermost").catch(() => { });
       }, 700);
     }
 
@@ -398,6 +398,8 @@ export default defineComponent({
 }
 
 .domain-card {
+  position: relative;
+  /* for check badge */
   display: flex;
   align-items: center;
   width: 90%;
@@ -408,8 +410,56 @@ export default defineComponent({
   cursor: pointer;
   transition: all 160ms ease;
   min-height: 72px;
+  padding: 12px;
 }
 
+.domain-card:focus {
+  outline: 3px solid rgba(3, 59, 197, 0.12);
+  outline-offset: 2px;
+}
+
+/* check badge in top-right */
+/* check badge (right-top) */
+.domain-check {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.95);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.18);
+  transform-origin: center;
+  animation: pop .12s ease;
+}
+
+.domain-check svg {
+  display: block;
+}
+
+
+/* show and animate when selected */
+.domain-card.selected .check-badge {
+  transform: scale(1);
+  opacity: 1;
+}
+
+/* smaller white tick svg inside */
+.check-badge svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* domain icon/body */
 .domain-icon {
   width: 56px;
   height: 56px;
@@ -418,6 +468,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
 }
 
 .domain-title {
@@ -456,91 +507,6 @@ export default defineComponent({
   gap: 8px;
 }
 
-/* mattermost panel */
-.mattermost-panel {
-  width: 52%;
-  padding: 32px;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-/* status visuals */
-.status-box {
-  border: 1px solid #e6e6e9;
-  border-radius: 10px;
-  padding: 18px;
-  max-width: 480px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.04);
-}
-
-.blue-circle {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background: #e1f6ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-}
-
-.dots {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #0096d6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 3px;
-}
-
-.dots span {
-  width: 5px;
-  height: 5px;
-  background: #fff;
-  border-radius: 50%;
-  animation: dotBlink 1s infinite;
-}
-
-@keyframes dotBlink {
-
-  0%,
-  80%,
-  100% {
-    opacity: .25
-  }
-
-  40% {
-    opacity: 1
-  }
-}
-
-.green-circle {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background: #e6f9ed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-}
-
-.status-text {
-  font-weight: 600;
-  font-size: 18px;
-  text-align: center;
-  margin-bottom: 6px;
-  color: #111827;
-}
-
-.status-success {
-  color: #16a34a;
-}
-
 /* responsiveness - stack and tighten on small screens */
 @media (max-width: 991.98px) {
   .se-card {
@@ -554,59 +520,8 @@ export default defineComponent({
     padding: 20px;
   }
 
-  .mattermost-panel {
-    width: 100%;
-    padding: 18px;
-    margin-top: 8px;
-  }
-
   .domains-grid {
     grid-template-columns: 1fr;
-  }
-
-  .tiles {
-    gap: 8px;
-  }
-
-  .provider-tile {
-    min-width: 40%;
-    padding: 10px;
-  }
-
-  .provider-row-inner {
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .divider {
-    display: none;
-  }
-}
-
-/* extra small screens - more compact */
-@media (max-width: 575.98px) {
-  .logo-placeholder {
-    width: 40px;
-    height: 40px;
-  }
-
-  .provider-tile {
-    min-width: 48%;
-  }
-
-  .domain-icon {
-    width: 48px;
-    height: 48px;
-    flex: 0 0 48px;
-  }
-
-  .domain-card {
-    padding: 12px;
-  }
-
-  .finish-btn {
-    padding: 8px 14px;
-    font-size: 0.95rem;
   }
 }
 </style>

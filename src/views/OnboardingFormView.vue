@@ -70,33 +70,42 @@
                   <div class="d-flex justify-content-between align-items-center mb-2">
                     <label class="form-label h5 text-center mb-0" style="color: #03318d;">Domains <small
                         class="text-muted ms-4">Choose one or more</small></label>
-
                   </div>
 
                   <div class="domains-grid">
                     <label v-for="opt in domainOptions" :key="opt.value" class="domain-card"
                       :class="{ selected: isSelected(opt.value) }" @click="toggleDomain(opt.value)" tabindex="0"
-                      @keydown.enter.prevent="toggleDomain(opt.value)">
+                      @keydown.enter.prevent="toggleDomain(opt.value)" role="checkbox"
+                      :aria-checked="isSelected(opt.value)">
+                      <!-- domain icon + body -->
                       <div class="domain-icon" v-html="opt.iconHtml"></div>
                       <div class="domain-body">
                         <div class="domain-title" style="color: #03318d;">{{ opt.label }}</div>
                         <div class="domain-sub small text-muted">{{ opt.desc }}</div>
                       </div>
+
+                      <!-- CHECK BADGE: appears when selected -->
+                      <span class="domain-check" v-if="isSelected(opt.value)" aria-hidden="false" title="Selected">
+                        <!-- compact check SVG -->
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true">
+                          <circle cx="12" cy="12" r="12" fill="#10B981" />
+                          <path d="M7.5 12.5l2.5 2.5L16.5 9" stroke="white" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        </svg>
+                      </span>
                     </label>
                   </div>
                 </div>
 
                 <!-- finish button aligned right corner -->
                 <div class="d-flex justify-content-end">
-                  <!-- use :aria-busy to bind the boolean, not a literal string -->
                   <button class="btn finish-btn" @click="onFinish" :disabled="submitting" :aria-busy="submitting">
                     <span v-if="submitting" class="spinner-border spinner-border-sm me-2" role="status"
                       aria-hidden="true"></span>
                     Finish
                   </button>
-
                 </div>
-
               </div>
             </aside>
           </div> <!-- se-card -->
@@ -209,10 +218,7 @@ export default defineComponent({
       // simulate submission then navigate to /add-location
       setTimeout(() => {
         submitting.value = false;
-        // navigate to add-location route
-        router.push("/add-location").catch(() => {
-          // ignore navigation errors (like same route)
-        });
+        router.push("/add-location").catch(() => { });
       }, 700);
     }
 
@@ -397,6 +403,7 @@ export default defineComponent({
   gap: 12px;
 }
 
+/* domain card - made position:relative to allow check badge */
 .domain-card {
   display: flex;
   align-items: center;
@@ -408,6 +415,9 @@ export default defineComponent({
   cursor: pointer;
   transition: all 160ms ease;
   min-height: 72px;
+  position: relative;
+  padding: 12px;
+  gap: 12px;
 }
 
 .domain-icon {
@@ -418,6 +428,11 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 56px;
+}
+
+.domain-body {
+  flex: 1 1 auto;
 }
 
 .domain-title {
@@ -443,6 +458,40 @@ export default defineComponent({
   background: rgba(34, 197, 94, 0.08);
 }
 
+/* check badge (right-top) */
+.domain-check {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.95);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.18);
+  transform-origin: center;
+  animation: pop .12s ease;
+}
+
+.domain-check svg {
+  display: block;
+}
+
+/* small pop animation when check appears */
+@keyframes pop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* finish button */
 .finish-btn {
   background: #03318d;
@@ -454,91 +503,6 @@ export default defineComponent({
   display: inline-flex;
   align-items: center;
   gap: 8px;
-}
-
-/* mattermost panel */
-.mattermost-panel {
-  width: 52%;
-  padding: 32px;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-/* status visuals */
-.status-box {
-  border: 1px solid #e6e6e9;
-  border-radius: 10px;
-  padding: 18px;
-  max-width: 480px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.04);
-}
-
-.blue-circle {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background: #e1f6ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-}
-
-.dots {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #0096d6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 3px;
-}
-
-.dots span {
-  width: 5px;
-  height: 5px;
-  background: #fff;
-  border-radius: 50%;
-  animation: dotBlink 1s infinite;
-}
-
-@keyframes dotBlink {
-
-  0%,
-  80%,
-  100% {
-    opacity: .25
-  }
-
-  40% {
-    opacity: 1
-  }
-}
-
-.green-circle {
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background: #e6f9ed;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 10px;
-}
-
-.status-text {
-  font-weight: 600;
-  font-size: 18px;
-  text-align: center;
-  margin-bottom: 6px;
-  color: #111827;
-}
-
-.status-success {
-  color: #16a34a;
 }
 
 /* responsiveness - stack and tighten on small screens */
@@ -554,44 +518,15 @@ export default defineComponent({
     padding: 20px;
   }
 
-  .mattermost-panel {
-    width: 100%;
-    padding: 18px;
-    margin-top: 8px;
-  }
-
   .domains-grid {
     grid-template-columns: 1fr;
   }
-
-  .tiles {
-    gap: 8px;
-  }
-
-  .provider-tile {
-    min-width: 40%;
-    padding: 10px;
-  }
-
-  .provider-row-inner {
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .divider {
-    display: none;
-  }
 }
 
-/* extra small screens - more compact */
 @media (max-width: 575.98px) {
   .logo-placeholder {
     width: 40px;
     height: 40px;
-  }
-
-  .provider-tile {
-    min-width: 48%;
   }
 
   .domain-icon {
@@ -601,12 +536,7 @@ export default defineComponent({
   }
 
   .domain-card {
-    padding: 12px;
-  }
-
-  .finish-btn {
-    padding: 8px 14px;
-    font-size: 0.95rem;
+    padding: 10px;
   }
 }
 </style>
