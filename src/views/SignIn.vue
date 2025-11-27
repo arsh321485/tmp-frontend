@@ -1,50 +1,50 @@
 <template>
-  <main class="split-signup min-vh-100 d-flex align-items-stretch">
+  <main class="se-page min-vh-100 d-flex align-items-center justify-content-center">
     <div class="container-fluid px-0">
-      <div class="row gx-0 justify-content-center">
+      <div class="row gx-0 justify-content-center w-100">
 
-        <!-- Centered card shell -->
-        <div class="col-12 col-xl-10">
-          <div class="card-shell d-flex overflow-hidden rounded-4">
+        <!-- Card centered on all breakpoints -->
+        <div class="col-12 col-sm-11 col-md-10 col-lg-10 col-xl-10 col-xxl-9 mx-auto se-card-col">
+          <div class="se-card d-flex overflow-hidden rounded-3 shadow-sm mx-auto">
 
-            <!-- LEFT: full-bleed image with centered H1 overlay -->
-            <aside class="col-12 col-lg-6 left-image-panel d-none d-lg-block">
-              <div class="left-image-wrapper" aria-hidden="false">
-                <img src="../assets/img/main.jpg" alt="illustration" class="left-image" />
-                <div class="left-gradient"></div>
-
-                <!-- overlay text -->
-                <div class="left-overlay-text">
-                  <h1 class="overlay-title">Sign in to TestMyPlan</h1>
-                  <p class="overlay-sub">Secure access for teams — pick up where you left off.</p>
-                </div>
+            <!-- LEFT: image panel (visible lg and up) -->
+            <aside class="se-left d-none d-lg-block">
+              <img src="../assets/img/main.jpg" alt="illustration" class="se-left-img" />
+              <div class="se-left-overlay">
+                <h2 class="se-left-title">Create your account</h2>
+                <p class="se-left-sub">Join TestMyPlan — collaborate faster, ship safer.</p>
+                <div class="se-data-protection">DATA PROTECTION</div>
               </div>
             </aside>
 
-            <!-- RIGHT: login form -->
-            <section class="col-12 col-lg-6 right-panel d-flex align-items-center justify-content-center py-5">
-              <div class="right-inner w-100 d-flex flex-column" style="max-width:520px; min-height:72vh;">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- RIGHT: sign-in form -->
+            <section class="se-right d-flex align-items-center">
+              <div class="w-100 se-right-inner">
+
+                <!-- header: title on left, sign-up link on right (single row) -->
+                <div class="d-flex justify-content-between align-items-start se-header-row">
                   <div>
-                    <h4 class="mb-0">Sign in to TestMyPlan</h4>
+                    <h4 class="se-title mb-1">Sign in to TestMyPlan</h4>
                     <small class="text-muted">Welcome back — please sign in to continue</small>
                   </div>
 
-                  <a class="small text-muted" href="#" @click.prevent="goToSignup">Sign up →</a>
+                  <a class="small text-muted tmp-signin-link align-self-start" href="#" @click.prevent="goToSignup">
+                    Sign up →
+                  </a>
                 </div>
 
-                <!-- Login form -->
-                <form @submit.prevent="onLogin" novalidate :class="{ 'was-validated': tried }" autocomplete="on">
+                <!-- sign-in form -->
+                <form @submit.prevent="onLogin" class="se-signin-form" :class="{ 'was-validated': tried }" novalidate
+                  autocomplete="on">
                   <div class="mb-3">
-                    <label class="form-label small mb-1" for="email">Email</label>
+                    <label for="email" class="form-label small  fw-semibold mb-1">Email</label>
                     <input id="email" v-model.trim="email" required type="email" class="form-control form-control-sm"
                       :class="{ 'is-invalid': emailError }" placeholder="Enter your email" autocomplete="email" />
                     <div class="invalid-feedback small">{{ emailError }}</div>
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label small mb-1" for="password">Password</label>
-
+                    <label for="password" class="form-label small  fw-semibold mb-1">Password</label>
                     <div class="input-group input-group-sm">
                       <input id="password" :type="show ? 'text' : 'password'" v-model="password" required
                         class="form-control form-control-sm" :class="{ 'is-invalid': passwordError }"
@@ -54,7 +54,6 @@
                         <i :class="show ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                       </button>
                     </div>
-
                     <div class="invalid-feedback small mt-1">{{ passwordError }}</div>
                   </div>
 
@@ -77,12 +76,12 @@
                   <p v-if="message" :class="['mt-2', messageClass, 'small']" role="alert">{{ message }}</p>
                 </form>
 
-                <!-- optional small footer -->
-                <div class="mt-auto pt-3">
-                  <p class="small text-muted mb-0">
-                    By signing in you accept our <a href="#" class="text-decoration-underline">Terms</a>.
-                  </p>
+                <!-- email sign-up link (desktop & mobile) -->
+                <div class="text-center mt-3">
+                  <router-link to="/signup-email" class="se-email-link">I don't have an account</router-link>
                 </div>
+
+
 
               </div>
             </section>
@@ -97,6 +96,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import type { Router } from "vue-router";
 
 /** Minimal typed shape for router (avoids using `any`) */
 interface RouterLike {
@@ -104,7 +104,7 @@ interface RouterLike {
 }
 
 export default defineComponent({
-  name: "SplitLogin_LeftImage",
+  name: "SigninExact",
   data() {
     return {
       email: "" as string,
@@ -140,6 +140,10 @@ export default defineComponent({
       if (!this.password) {
         this.passwordError = "Password is required";
         ok = false;
+      } else if (this.password.length < 6) {
+        // optional: encourage stronger passwords
+        this.passwordError = "Password must be at least 6 characters";
+        ok = false;
       }
 
       return ok;
@@ -154,14 +158,14 @@ export default defineComponent({
 
       this.submitting = true;
       try {
-        // NO API integration here — simulate network delay for UI testing
+        // simulate network call (demo)
         await new Promise<void>((resolve) => setTimeout(() => resolve(), 700));
 
-        // Success behaviour (demo)
+        // demo success
         this.message = "Signed in (demo)";
         this.messageClass = "text-success";
 
-        // Navigate to dashboard (typed router guard)
+        // navigate to dashboard if router available
         const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
         if (maybeRouter && typeof maybeRouter.push === "function") {
           await maybeRouter.push({ path: "/dashboard" });
@@ -169,7 +173,6 @@ export default defineComponent({
           window.location.href = "/dashboard";
         }
       } catch (err: unknown) {
-        // Narrow unknown -> Error (no `any`)
         if (err instanceof Error) {
           this.message = err.message || "Unable to sign in. Check credentials.";
         } else {
@@ -181,130 +184,158 @@ export default defineComponent({
       }
     },
 
-    onGoogle(): void {
-      // demo placeholder
-      void alert("Google sign-in (demo)");
-    },
-
-    goToForgot(): void {
-      const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
-      if (maybeRouter && typeof maybeRouter.push === "function") {
-        void maybeRouter.push({ path: "/forgetpassword" });
-        return;
-      }
-      window.location.href = "/forgetpassword";
-    },
-
-    goToSignup(): void {
-      const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
-      if (maybeRouter && typeof maybeRouter.push === "function") {
-        void maybeRouter.push({ path: "/signup" });
+    // navigation helpers (typed)
+    goToSignup(this: { $router?: Router }) {
+      const router = this.$router;
+      if (router) {
+        router.push("/signup");
         return;
       }
       window.location.href = "/signup";
+    },
+
+    goToForgot(this: { $router?: Router }) {
+      const router = this.$router;
+      if (router) {
+        router.push("/forgetpassword");
+        return;
+      }
+      window.location.href = "/forgetpassword";
     },
   },
 });
 </script>
 
-<style scoped>
-/* THEME A — consistent card shell + left image + right panel */
-
-/* page background (keeps subtle) */
-.split-signup {
+<style>
+/* Page background */
+.se-page {
   background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
-  padding: 32px 12px;
+  padding: 28px 12px;
+  color: #06307a;
 }
 
-/* centered card shell */
-.card-shell {
-  display: flex;
-  border-radius: 18px;
+/* Card container spacing to match screenshot */
+.se-card-col {
+  padding: 36px 10px;
+}
+
+/* Card style — kept compact and centered */
+.se-card {
+  background: #fff;
+  border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
-  box-shadow: 0 12px 40px rgba(18, 38, 84, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(11, 42, 102, 0.06);
+  box-shadow: 0 8px 30px rgba(18, 38, 84, 0.06);
+  min-height: 520px;
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: stretch;
 }
 
-/* LEFT IMAGE PANEL */
-.left-image-panel {
+/* LEFT image panel */
+.se-left {
+  width: 54%;
+  min-height: 520px;
   position: relative;
   padding: 0;
-  min-height: 520px;
   overflow: hidden;
 }
 
-.left-image-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-.left-image {
+.se-left-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: saturate(1.04) contrast(0.98);
-}
-
-/* subtle gradient so white text pops */
-.left-gradient {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(1, 24, 39, 0.45) 0%, rgba(1, 24, 39, 0.12) 40%, rgba(1, 24, 39, 0.02) 100%);
+  filter: saturate(1.05) contrast(0.98);
 }
 
 /* overlay text */
-.left-overlay-text {
+.se-left-overlay {
   position: absolute;
   inset: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
   text-align: center;
-  padding: 40px;
-  z-index: 3;
   color: #fff;
+  pointer-events: none;
+  padding: 24px;
 }
 
-.overlay-title {
-  font-size: 2.1rem;
+.se-left-title {
+  font-size: 26px;
   font-weight: 700;
   margin: 0;
   text-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
 }
 
-.overlay-sub {
+.se-left-sub {
   margin-top: 8px;
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
 }
 
-/* RIGHT PANEL */
-.right-panel {
-  background: #ffffff;
+/* DATA PROTECTION pill */
+.se-data-protection {
+  margin-top: 56px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #c7ffff;
+}
+
+/* RIGHT panel */
+.se-right {
+  width: 46%;
+  padding: 36px 48px;
+  background: #fff;
   display: flex;
   align-items: center;
+  /* center vertical */
   justify-content: center;
-  padding-left: 40px;
-  padding-right: 40px;
 }
 
-/* form container */
-.right-inner {
+/* inner wrapper has constrained width so content centers and looks like the screenshot */
+.se-right-inner {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+  /* center form vertically inside right column */
 }
 
-/* typography */
-h4 {
-  font-weight: 700;
+/* header row increased gap so providers sit lower */
+.se-header-row {
+  margin-bottom: 20px;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* sign-up link style */
+.tmp-signin-link {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.tmp-signin-link:hover {
   color: #03318d;
+  text-decoration: underline;
 }
 
-/* small tweaks to inputs and buttons */
+/* header/title */
+.se-title {
+  color: #03318d;
+  font-weight: 700;
+}
+
+/* form tweaks */
 .form-control {
   font-size: 0.93rem;
   padding: 0.44rem 0.6rem;
@@ -347,30 +378,59 @@ h4 {
   color: #6b7280 !important;
 }
 
-/* invalid feedback smaller */
+/* small invalid feedback */
 .invalid-feedback.small {
   font-size: 0.82rem;
 }
 
-/* footer small note */
-.right-inner>.mt-auto {
-  margin-top: 18px;
+/* email link and terms */
+.se-email-link {
+  color: #6c6c6c;
+  text-decoration: underline;
 }
 
-/* responsive */
+/* Responsive: hide left panel on md and below; reduce paddings so no big bottom gap */
 @media (max-width: 991.98px) {
-  .card-shell {
-    flex-direction: column-reverse;
+  .se-card {
+    flex-direction: column;
+    min-height: auto;
+    max-width: 720px;
   }
 
-  .left-image-panel {
+  .se-left {
+    display: none !important;
+  }
+
+  .se-right {
+    width: 100%;
+    padding: 28px 20px;
+  }
+
+  .se-card-col {
+    padding: 20px 10px;
+  }
+
+  .se-data-protection {
     display: none;
   }
 
-  .right-inner {
-    padding-left: 20px;
-    padding-right: 20px;
-    min-height: 60vh;
+  .se-left-title {
+    font-size: 20px;
+  }
+
+  .se-header-row {
+    margin-bottom: 18px;
+  }
+
+  .se-right-inner {
+    max-width: 100%;
+  }
+}
+
+/* Very large screens: cap width so card doesn't become extremely wide */
+@media (min-width: 1600px) {
+  .se-card {
+    max-width: 1100px;
   }
 }
 </style>

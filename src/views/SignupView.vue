@@ -116,10 +116,10 @@ export default defineComponent({
     goToSignin(this: { $router?: Router }) {
       const router = this.$router;
       if (router) {
-        router.push("/login");
+        router.push("/signin");
         return;
       }
-      window.location.href = "/login";
+      window.location.href = "/signin";
     }
   }
 });

@@ -23,28 +23,43 @@
                 <!-- welcome centered -->
                 <div class="text-center se-labels mb-4">
                   <h2 class="se-main">Welcome to Test My Plan</h2>
-                  <p class="se-sub">Get started with your incident preparedness...</p>
+                  <p class="se-sub">Get started with your incident preparedness</p>
                 </div>
 
                 <!-- Add organization heading -->
                 <div class="text-center mb-3">
-                  <h5 class="org-heading" style="color: #03318d;">Add Organization Details</h5>
+                  <h5 class="org-heading">Add Organization Details</h5>
                 </div>
 
                 <!-- organization inputs (two side-by-side) -->
                 <div class="row gx-3 mb-3">
                   <div class="col-12 col-md-6 mb-2">
-                    <label class="form-label small mb-1">Organization</label>
+                    <label class="form-label small  fw-semibold mb-1">Organization</label>
                     <input v-model.trim="local.organization" type="text" class="form-control form-control-sm"
                       placeholder="Organization name" />
                   </div>
                   <div class="col-12 col-md-6 mb-2">
-                    <label class="form-label small mb-1">Industry</label>
+                    <label class="form-label small  fw-semibold mb-1">Industry</label>
                     <select v-model="local.industry" class="form-select form-select-sm">
                       <option value="" disabled>Select industry</option>
-                      <option value="a">a</option>
-                      <option value="b">b</option>
-                      <option value="c">c</option>
+                      <option value="Airline">Airline</option>
+                      <option value="Automotive">Automotive</option>
+                      <option value="Banking">Banking</option>
+                      <option value="Communication">Communication</option>
+                      <option value="Construction">Construction</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Hospitality">Hospitality</option>
+                      <option value="Information Technology">Information Technology</option>
+                      <option value="Manufacturing">Manufacturing</option>
+                      <option value="Mining">Mining</option>
+                      <option value="Oil and Gas">Oil and Gas</option>
+                      <option value="Petrochemical">Petrochemical</option>
+                      <option value="Pharmaceuticals">Pharmaceuticals</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Shipping">Shipping</option>
+                      <option value="Transport">Transport</option>
+
+
                     </select>
                   </div>
                 </div>
@@ -52,7 +67,7 @@
                 <!-- country -->
                 <div class="row gx-3 mb-4">
                   <div class="col-12 col-md-6">
-                    <label class="form-label small mb-1">Country</label>
+                    <label class="form-label small  fw-semibold mb-1">Country</label>
                     <select v-model="local.location" class="form-select form-select-sm">
                       <option value="" disabled>Select country</option>
                       <option>United States</option>
@@ -67,9 +82,10 @@
 
                 <!-- domains grid -->
                 <div class="domains-section mb-4">
-                  <div class="d-flex justify-content-between align-items-center mb-2">
-                    <label class="form-label h5 text-center mb-0" style="color: #03318d;">Domains <small
-                        class="text-muted ms-4">Choose one or more</small></label>
+                  <div class="d-flex  align-items-center mb-2">
+                    <h5 class="org-heading" style="color: #03318d;">Domains
+                    </h5>
+                    <span class=" small ms-4 ">(Choose one or more)</span>
                   </div>
 
                   <div class="domains-grid">

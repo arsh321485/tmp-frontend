@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import SignupView from '@/views/SignupView.vue'
-import LoginView from '@/views/LoginView.vue'
+import SignInView from '@/views/SignIn.vue'
 import EmailAuthView from '@/views/EmailAuthView.vue'
 import ForgetPasswordView from '@/views/ForgetPasswordView.vue'
 import SignupEmailView from '@/views/SignupEmailView.vue'
@@ -58,9 +58,9 @@ const router = createRouter({
       component: MattermostView
     },
     {
-      path: '/login1',
-      name: 'login',
-      component: LoginView
+      path: '/signin',
+      name: 'signin',
+      component: SignInView
     },
     {
       path: '/emailauth',

@@ -32,7 +32,7 @@
                 <form @submit.prevent="onSubmit" novalidate :class="{ 'was-validated': tried }">
                   <!-- Name -->
                   <div class="mb-3">
-                    <label class="form-label small mb-1">Name</label>
+                    <label class="form-label small fw-semibold mb-1">Name</label>
                     <input v-model.trim="form.name"
                       :class="['form-control', 'form-control-sm', { 'is-invalid': nameError }]" type="text"
                       placeholder="Full name" required />
@@ -41,7 +41,7 @@
 
                   <!-- Email -->
                   <div class="mb-3">
-                    <label class="form-label small mb-1">Email address</label>
+                    <label class="form-label small fw-semibold  mb-1">Email address</label>
                     <input v-model.trim="form.email"
                       :class="['form-control', 'form-control-sm', { 'is-invalid': emailError }]" type="email"
                       placeholder="you@example.com" required />
@@ -50,14 +50,15 @@
 
                   <!-- Password -->
                   <div class="mb-3">
-                    <label class="form-label small mb-1">Password</label>
+                    <label class="form-label small fw-semibold  mb-1">Password</label>
                     <div class="input-group input-group-sm">
-                      <input v-model="form.password" :class="['form-control', { 'is-invalid': passwordError }]"
+                      <input v-model="form.password"
+                        :class="['form-control', 'form-control-sm', { 'is-invalid': passwordError }]"
                         :type="showPassword ? 'text' : 'password'" placeholder="Enter a password (min 8 characters)"
                         required />
-                      <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
-                        @click="toggleShowPassword" :aria-pressed="showPassword"
-                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      <div class="invalid-feedback small">{{ passwordError }}</div>
+                      <button class="btn btn-sm btn-icon input-addon" type="button" @click="toggleShowPassword"
+                        :aria-pressed="showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'"
                         title="Toggle password visibility">
                         <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                       </button>
@@ -68,17 +69,17 @@
 
                   <!-- Confirm Password -->
                   <div class="mb-3">
-                    <label class="form-label small mb-1">Confirm Password</label>
+                    <label class="form-label small fw-semibold  mb-1">Confirm Password</label>
                     <div class="input-group input-group-sm">
                       <input v-model="form.confirmPassword"
                         :class="['form-control', 'form-control-sm', { 'is-invalid': confirmError }]"
                         :type="showPassword ? 'text' : 'password'" placeholder="Re-enter password" required />
-                      <button class="btn btn-outline-secondary btn-sm btn-icon" type="button"
-                        @click="toggleShowPassword" :aria-pressed="showPassword"
-                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      <button class="btn btn-sm  btn-icon input-addon" type="button" @click="toggleShowPassword"
+                        :aria-pressed="showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'"
                         title="Toggle password visibility">
                         <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                       </button>
+                      <div class="invalid-feedback small">{{ confirmError }}</div>
                     </div>
                     <div class="invalid-feedback small">{{ confirmError }}</div>
                   </div>
@@ -254,6 +255,7 @@ export default defineComponent({
 .split-signup {
   background: linear-gradient(180deg, #f6f9ff 0%, #eef5fb 100%);
   padding: 32px 12px;
+  color: #06307a;
 }
 
 /* card shell styled like providers page */
@@ -267,7 +269,6 @@ export default defineComponent({
   min-height: 560px;
   max-width: 1000px;
   margin: auto;
-  /* centered vertically & horizontally inside the full-height container */
 }
 
 /* LEFT image panel - same width as providers page */
@@ -334,7 +335,6 @@ export default defineComponent({
 /* constrain the form area to be narrower like providers page */
 .right-card {
   max-width: 420px;
-  /* MATCHED: narrower card similar to providers layout */
   width: 100%;
   min-height: 420px;
   display: flex;
@@ -360,18 +360,42 @@ export default defineComponent({
   padding: 0.44rem 0.6rem;
   border-radius: 8px;
   border: 1px solid #e6e9ec;
+  /* make right edge flush when input-group used */
 }
 
+/* ensure input sits nicely next to the eye button */
 .input-group .form-control {
   border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-.btn-icon {
+/* eye toggle button inside the input-group (visually part of control) */
+.input-addon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.36rem 0.5rem;
-  border-radius: 8px;
+  padding: 0 10px;
+  border-left: 1px solid #e6e9ec;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background: #fff;
+  color: #6b7280;
+  height: calc(1.5em + 1rem);
+  /* aligns with .form-control-sm height */
+  line-height: 1;
+}
+
+/* small variant styling to match input-group-sm */
+.input-group-sm>.input-addon,
+.input-group-sm>.form-control {
+  height: calc(1.5em + 0.625rem);
+}
+
+/* remove extra focus outline on the button (keep accessibility via aria) */
+.input-addon:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 /* dark primary button like provider page */

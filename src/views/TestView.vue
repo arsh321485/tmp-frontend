@@ -1,406 +1,389 @@
 <template>
-  <main class="se-page min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="container-fluid px-0">
-      <div class="row gx-0 justify-content-center w-100">
+  <div class="page-wrap p-4">
+    <!-- LOCATIONS -->
+    <section class="mb-5 card p-4">
+      <h3 class="mb-2">Locations</h3>
+      <p class="text-muted small mb-3">Add locations to assign to team members. Select one or more.</p>
 
-        <!-- Card centered -->
-        <div class="col-12 col-sm-11 col-md-10 col-lg-10 col-xl-10 col-xxl-9 mx-auto se-card-col">
-          <div class="se-card d-flex overflow-hidden rounded-3 shadow-sm mx-auto">
+      <div class="d-flex align-items-center gap-3">
+        <!-- DROPDOWN WRAPPER -->
+        <div class="dropdown" ref="dropdownRef">
+          <!-- toggle button (stop propagation so doc click doesn't immediately close) -->
+          <button class="btn btn-light dropdown-toggle" @click.stop="toggleDropdown" :aria-expanded="open">
+            {{ selectedLocations.length ? selectedLocations.join(', ') : 'Choose locations' }}
+          </button>
 
-            <!-- LEFT: organization form (replaces image panel) -->
-            <aside class="se-left org-left p-4">
-              <div class="org-left-inner" style="color:#fff;">
-                <h2 class="se-left-title" style="color:#fff;">Organization</h2>
-                <p class="se-left-sub" style="color:rgba(255,255,255,0.9);">Provide your organization info</p>
+          <!-- dropdown menu -->
+          <div v-if="open" class="dropdown-menu p-3 shadow-sm" @click.stop>
+            <div class="preset-list mb-2">
+              <label v-for="loc in availableLocations" :key="loc" class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" :id="'chk-' + loc" :value="loc"
+                  v-model="selectedPresets" />
+                <span class="form-check-label">{{ loc }}</span>
+              </label>
+            </div>
 
-                <div style="margin-top:18px;">
-                  <label class="form-label small mb-1" style="color:#dbe9ff">Organization Name</label>
-                  <input v-model.trim="left.local.organization" type="text" class="form-control form-control-sm"
-                    placeholder="Organization (optional)" />
-                </div>
+            <div class="d-flex gap-2 mt-2">
+              <input class="input form-control" v-model.trim="dropdownCustom" placeholder="Add custom (comma-separated)"
+                @keydown.enter.prevent="addFromDropdown" />
+              <button class="btn btn-success" @click="addFromDropdown" :disabled="adding">
+                <span v-if="adding" class="spinner-border spinner-border-sm me-1" role="status"
+                  aria-hidden="true"></span>
+                Add
+              </button>
+            </div>
 
-                <div class="mt-3">
-                  <label class="form-label small mb-1" style="color:#dbe9ff">Location</label>
-                  <select v-model="left.local.location" class="form-select form-select-sm">
-                    <option value="" disabled>Select location</option>
-                    <option>United States</option>
-                    <option>United Kingdom</option>
-                    <option>India</option>
-                    <option>Canada</option>
-                    <option>Australia</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-
-                <div class="mt-3">
-                  <label class="form-label small mb-1" style="color:#dbe9ff">Industry</label>
-                  <select v-model="left.local.industry" class="form-select form-select-sm">
-                    <option value="" disabled>Select industry</option>
-                    <option value="a">a</option>
-                    <option value="b">b</option>
-                    <option value="c">c</option>
-                  </select>
-                </div>
-
-                <div class="mt-3">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <label class="form-label small mb-0" style="color:#dbe9ff">Domains</label>
-                    <small class="text-muted">Choose one or more</small>
-                  </div>
-
-                  <div class="domains-grid mt-2">
-                    <label v-for="opt in left.domainOptions" :key="opt.value" class="domain-card"
-                      :class="{ selected: left.selectedDomains.includes(opt.value) }" tabindex="0"
-                      @click="leftToggle(opt.value)">
-                      <div class="domain-icon" v-html="opt.iconHtml"></div>
-                      <div class="domain-body">
-                        <div class="domain-title">{{ opt.label }}</div>
-                        <div class="domain-sub small text-muted">{{ opt.desc }}</div>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="mt-4 d-flex gap-2">
-                  <button class="btn btn-primary" @click="onLeftFinish" :disabled="left.submitting">
-                    <span v-if="left.submitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    Finish
-                  </button>
-                  <button class="btn btn-outline-secondary" @click="resetLeft"
-                    :disabled="left.submitting">Reset</button>
-                </div>
-
+            <div class="d-flex justify-content-between mt-3">
+              <button class="btn btn-outline-secondary btn-sm" @click="clearSelection">Clear</button>
+              <div>
+                <button class="btn btn-light btn-sm me-2" @click="closeDropdown">Done</button>
+                <button class="btn btn-primary btn-sm" @click="applySelection">Apply</button>
               </div>
-            </aside>
-
-            <!-- RIGHT: onboarding or mattermost, toggles -->
-            <section class="se-right d-flex align-items-center">
-              <div class="w-100 se-right-inner">
-
-                <!-- If showMattermost = false show onboarding summary; else show mattermost connect UI -->
-                <div v-if="!showMattermost">
-                  <h4 class="mb-1 se-title">Onboarding summary</h4>
-                  <p class="small text-muted mb-3">Review your choices and complete connection.</p>
-
-                  <div class="white-card p-3 mb-3">
-                    <div><strong>Organization:</strong> {{ left.local.organization || "-" }}</div>
-                    <div><strong>Location:</strong> {{ left.local.location || "-" }}</div>
-                    <div><strong>Industry:</strong> {{ left.local.industry || "-" }}</div>
-                    <div><strong>Domains:</strong> <span>{{ left.selectedDomains.join(", ") || "-" }}</span></div>
-                  </div>
-
-                  <div class="d-grid mb-0">
-                    <button class="btn btn-primary btn-md" @click="showMattermost = true">Proceed to Mattermost
-                      setup</button>
-                  </div>
-
-                </div>
-
-                <div v-else>
-                  <!-- Mattermost connect UI -->
-                  <h4 class="mb-1 se-title">I'm your reporting manager</h4>
-                  <small class="text-muted">Let's set up your reporting time</small>
-
-                  <hr style="margin:18px 0;border-color:rgba(11,42,102,0.06)" />
-
-                  <p class="mb-3">Please setup your email with Mattermost to continue...</p>
-
-                  <div class="mb-3">
-                    <button class="btn btn-primary btn-md" :disabled="mm.connecting" @click="connectToMattermost"
-                      style="padding:10px 28px;border-radius:8px;font-weight:700;">
-                      <span v-if="mm.connecting" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                      Connect to Mattermost
-                    </button>
-                    <button class="btn btn-outline-secondary ms-2" @click="showMattermost = false">Back</button>
-                  </div>
-
-                  <div class="status-card mx-auto"
-                    :class="{ pending: mm.status === 'pending', connected: mm.status === 'connected' }">
-                    <div class="status-icon">
-                      <svg v-if="mm.status === 'pending'" width="36" height="36" viewBox="0 0 24 24" fill="none"
-                        aria-hidden="true">
-                        <circle cx="12" cy="12" r="10" fill="#e6f6ff" />
-                        <circle cx="12" cy="12" r="4" fill="#cdeefe" />
-                        <circle cx="12" cy="12" r="2" fill="#a0ddff" />
-                      </svg>
-
-                      <svg v-if="mm.status === 'connected'" width="36" height="36" viewBox="0 0 24 24" fill="none"
-                        aria-hidden="true">
-                        <circle cx="12" cy="12" r="12" fill="#e9fdf2" />
-                        <path d="M7 12.5l2.5 2.5 7-7" stroke="#059669" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round" />
-                      </svg>
-                    </div>
-
-                    <div class="status-body">
-                      <div class="status-title">Status: <span class="status-strong">{{ mm.status === 'pending' ?
-                        'Pending' : 'Connected' }}</span></div>
-                      <div class="status-sub small text-muted">
-                        <template v-if="mm.status === 'pending'">
-                          You haven't set up your email with Mattermost yet.
-                        </template>
-                        <template v-else>
-                          Your account is connected — you will receive reports via Mattermost.
-                        </template>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </section>
-
+            </div>
           </div>
         </div>
 
+        <div class="small text-muted">Select multiple presets or type customs in dropdown</div>
+
+        <div class="ms-auto">
+          <button class="btn btn-primary" @click="saveLocations" :disabled="!selectedLocations.length">Save</button>
+        </div>
       </div>
-    </div>
-  </main>
+
+      <!-- chips -->
+      <div v-if="selectedLocations.length" class="chips mt-3">
+        <template v-for="(loc, idx) in selectedLocations" :key="loc">
+          <span class="chip">
+            {{ loc }}
+            <button class="chip-remove" @click="removeLocation(idx)" :aria-label="'Remove ' + loc">×</button>
+          </span>
+        </template>
+      </div>
+    </section>
+
+    <!-- CONFIGURE TEAMS (kept minimal for demo) -->
+    <section class="card p-4" :class="{ 'disabled-section': !teamsEnabled }">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h4 class="mb-1">Configure Your Teams</h4>
+          <small class="text-muted">Add members to the team</small>
+        </div>
+        <div>
+          <button class="btn btn-danger btn-sm" @click="addTeamRow" :disabled="!teamsEnabled">+</button>
+        </div>
+      </div>
+
+      <div class="tabs mb-3">
+        <button v-for="(t, i) in tabs" :key="t" class="btn btn-sm me-2"
+          :class="i === activeTab ? 'btn-outline-primary' : 'btn-light'" @click="activeTab = i"
+          :disabled="!teamsEnabled">
+          {{ t }}
+        </button>
+      </div>
+
+      <div class="team-name mb-2">
+        <h5 class="mb-0">Team {{ activeTab + 1 }}</h5>
+        <div class="small text-muted">Members: {{ teamRows.length }}</div>
+      </div>
+
+      <!-- simplified rows -->
+      <div class="row fw-bold py-2 border-bottom">
+        <div class="col-3">ROLE</div>
+        <div class="col-4">ASSIGN MEMBER</div>
+        <div class="col-3">BACKUP MEMBER</div>
+        <div class="col-2">LOCATION</div>
+      </div>
+
+      <div v-for="(row, idx) in teamRows" :key="row.id" class="row align-items-center py-3 border-bottom">
+        <div class="col-3">
+          <div class="fw-semibold">{{ row.role }}</div>
+        </div>
+        <div class="col-4">
+          <select class="form-select form-select-sm" v-model="row.assign" :disabled="!teamsEnabled">
+            <option value="">Select</option>
+            <option v-for="u in users" :key="u.email" :value="u.name">{{ u.name }}</option>
+          </select>
+        </div>
+        <div class="col-3">
+          <select class="form-select form-select-sm" v-model="row.backup" :disabled="!teamsEnabled">
+            <option value="">Select</option>
+            <option v-for="u in users" :key="u.email + 'b' + idx" :value="u.name">{{ u.name }}</option>
+          </select>
+        </div>
+        <div class="col-2 text-end">
+          <select class="form-select form-select-sm" v-model="row.location" :disabled="!teamsEnabled">
+            <option value="">Select</option>
+            <option v-for="loc in selectedLocations" :key="loc" :value="loc">{{ loc }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="small text-muted">Tip: add locations first.</div>
+        <div>
+          <button class="btn btn-secondary btn-sm me-2" @click="resetAll" :disabled="!teamsEnabled">Reset</button>
+          <button class="btn btn-primary" @click="saveTeams" :disabled="!teamsEnabled">Save</button>
+        </div>
+      </div>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref, computed, nextTick, onMounted, onBeforeUnmount } from "vue";
 
-interface DomainOption {
-  value: string;
-  label: string;
-  desc?: string;
-  iconHtml?: string;
-}
-
-interface LocalState {
-  organization: string;
-  location: string;
-  industry: string;
-}
+type TeamRow = { id: number; role: string; assign: string; backup: string; location: string };
 
 export default defineComponent({
-  name: "OrgAndMattermost",
-  data() {
-    const domainOptions: DomainOption[] = [
-      { value: "cybersecurity", label: "Cybersecurity", desc: "Good for B2B businesses", iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M12 2l7 3v4c0 5-3.6 9.7-7 11-3.4-1.3-7-6-7-11V5l7-3z" fill="#eef6ff"/></svg>` },
-      { value: "data-privacy", label: "Data Privacy", desc: "Good for B2B businesses", iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" fill="#fff7ed"/></svg>` },
-      { value: "business-continuity", label: "Business Continuity", desc: "Good for B2B businesses", iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#ecfdf5"/></svg>` },
-      { value: "all", label: "All", desc: "Select all domains", iconHtml: `<svg width="36" height="36" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" fill="#ebf8ff"/></svg>` }
-    ];
+  name: "LocationsAndTeams",
+  setup() {
+    // presets
+    const availableLocations = ref<string[]>(["Sydney", "New York", "London", "Tokyo"]);
+
+    // final chosen locations used by teams
+    const selectedLocations = ref<string[]>([]);
+
+    // checkbox state inside dropdown and custom input
+    const selectedPresets = ref<string[]>([]);
+    const dropdownCustom = ref("");
+    const open = ref(false);
+    const adding = ref(false);
+
+    // dropdown wrapper ref for click-outside detection
+    const dropdownRef = ref<HTMLElement | null>(null);
+
+    // Toggle dropdown (stop propagation in template so this won't immediately be closed by doc click)
+    function toggleDropdown() {
+      open.value = !open.value;
+      if (open.value) {
+        nextTick(() => {
+          // focus the custom input if present
+          const el = dropdownRef.value?.querySelector<HTMLInputElement>(".input");
+          el?.focus();
+        });
+      }
+    }
+
+    // Add selected presets + customs to selectedLocations then close
+    function applySelection() {
+      const customs = dropdownCustom.value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const combined = [...selectedPresets.value, ...customs];
+
+      const toAdd = combined.filter((c) => {
+        const lc = c.trim().toLowerCase();
+        return lc && !selectedLocations.value.some((s) => s.toLowerCase() === lc);
+      });
+      if (toAdd.length) selectedLocations.value.push(...toAdd);
+
+      // reset dropdown selections and close
+      selectedPresets.value = [];
+      dropdownCustom.value = "";
+      open.value = false;
+    }
+
+    // immediate add (Add button) — similar to applySelection but keeps UX slightly different
+    async function addFromDropdown() {
+      adding.value = true;
+      const customs = dropdownCustom.value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      const combined = [...selectedPresets.value, ...customs];
+
+      const toAdd = combined.filter((c) => {
+        const lc = c.trim().toLowerCase();
+        return lc && !selectedLocations.value.some((s) => s.toLowerCase() === lc);
+      });
+
+      // small delay for UX
+      await new Promise((r) => setTimeout(r, 150));
+
+      if (toAdd.length) selectedLocations.value.push(...toAdd);
+
+      selectedPresets.value = [];
+      dropdownCustom.value = "";
+      adding.value = false;
+
+      // close shortly after
+      setTimeout(() => (open.value = false), 120);
+    }
+
+    // Save (stub)
+    function saveLocations() {
+      alert(`Saved locations: ${selectedLocations.value.join(", ")}`);
+    }
+
+    function removeLocation(idx: number) {
+      selectedLocations.value.splice(idx, 1);
+    }
+
+    function clearSelection() {
+      selectedPresets.value = [];
+      dropdownCustom.value = "";
+    }
+
+    // click outside => close dropdown
+    function handleDocClick(e: MouseEvent) {
+      const el = dropdownRef.value;
+      if (!el) return;
+      const target = e.target as Node;
+      if (!el.contains(target)) {
+        open.value = false;
+      }
+    }
+
+    onMounted(() => document.addEventListener("click", handleDocClick));
+    onBeforeUnmount(() => document.removeEventListener("click", handleDocClick));
+
+    // TEAMS
+    const teamsEnabled = computed(() => selectedLocations.value.length > 0);
+
+    const users = ref([
+      { name: "Amit Sharma", email: "amit@example.com" },
+      { name: "Sara Khan", email: "sara@example.com" },
+      { name: "Diego Lopez", email: "diego@example.com" },
+      { name: "Lina Park", email: "lina@example.com" }
+    ]);
+
+    const tabs = ref(["Team 1", "Team 2", "Team 3"]);
+    const activeTab = ref(0);
+
+    const teamRows = ref<TeamRow[]>([
+      { id: 1, role: "Owner", assign: "", backup: "", location: "" },
+      { id: 2, role: "Analyst", assign: "", backup: "", location: "" }
+    ]);
+
+    function addTeamRow() {
+      const nextId = teamRows.value.length ? Math.max(...teamRows.value.map((r) => r.id)) + 1 : 1;
+      teamRows.value.push({ id: nextId, role: `Role ${nextId}`, assign: "", backup: "", location: "" });
+    }
+
+    function resetAll() {
+      teamRows.value.forEach((r) => {
+        r.assign = "";
+        r.backup = "";
+        r.location = "";
+      });
+    }
+
+    function saveTeams() {
+      const missing = teamRows.value.some((r) => !r.location);
+      if (missing) {
+        alert("Please assign a location to every team member before saving.");
+        return;
+      }
+      alert("Teams saved — " + JSON.stringify(teamRows.value, null, 2));
+    }
 
     return {
-      // left form state
-      left: {
-        submitting: false,
-        local: {
-          organization: "",
-          location: "",
-          industry: ""
-        } as LocalState,
-        domainOptions,
-        selectedDomains: [] as string[]
-      },
-
-      // right state toggle and mattermost status
-      showMattermost: false,
-      mm: {
-        connecting: false,
-        status: "pending" as "pending" | "connected"
-      }
+      availableLocations,
+      selectedLocations,
+      selectedPresets,
+      dropdownCustom,
+      open,
+      adding,
+      dropdownRef,
+      toggleDropdown,
+      applySelection,
+      addFromDropdown,
+      saveLocations,
+      removeLocation,
+      clearSelection,
+      teamsEnabled,
+      users,
+      tabs,
+      activeTab,
+      teamRows,
+      addTeamRow,
+      resetAll,
+      saveTeams
     };
-  },
-  methods: {
-    leftToggle(val: string) {
-      // toggle selection behavior (maintain 'all' consistency)
-      const sd = this.left.selectedDomains;
-      if (val === "all") {
-        const hasAll = sd.includes("all");
-        if (hasAll) {
-          this.left.selectedDomains = [];
-        } else {
-          this.left.selectedDomains = this.left.domainOptions.map((o: DomainOption) => o.value);
-        }
-        return;
-      }
-
-      const idx = sd.indexOf(val);
-      if (idx === -1) sd.push(val); else sd.splice(idx, 1);
-
-      const nonAll = this.left.domainOptions.filter(o => o.value !== "all").map(o => o.value);
-      const allSelected = nonAll.every(v => sd.includes(v));
-      const allIdx = sd.indexOf("all");
-      if (allSelected && allIdx === -1) sd.push("all");
-      if (!allSelected && allIdx !== -1) sd.splice(allIdx, 1);
-    },
-
-    onLeftFinish() {
-      // minimal validation
-      if (!this.left.local.location) {
-        window.alert("Please select a location.");
-        return;
-      }
-      if (!this.left.local.industry) {
-        window.alert("Please select an industry.");
-        return;
-      }
-
-      this.left.submitting = true;
-      setTimeout(() => {
-        this.left.submitting = false;
-        // show Mattermost UI on the right
-        this.showMattermost = true;
-      }, 700);
-    },
-
-    resetLeft() {
-      this.left.local.organization = "";
-      this.left.local.location = "";
-      this.left.local.industry = "";
-      this.left.selectedDomains = [];
-    },
-
-    // mattermost simulated flow
-    connectToMattermost() {
-      if (this.mm.connecting) return;
-      this.mm.connecting = true;
-      // simulate async OAuth start; in real app redirect to backend oauth start
-      setTimeout(() => {
-        this.mm.connecting = false;
-        this.mm.status = "connected";
-      }, 1300);
-    }
   }
 });
 </script>
 
 <style scoped>
-/* reuse your se-* CSS + small adjustments so left panel looks good as a form */
-
-/* keep the existing .se-page, .se-card etc coming from your global stylesheet.
-   Add minimal left-form styling here. */
-
-.org-left {
-  width: 48%;
-  min-height: 560px;
-  padding: 28px;
-  background: linear-gradient(180deg, #061333, #082042);
-  display: flex;
-  align-items: flex-start;
-  color: #fff;
+.page-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-.org-left .form-control,
-.org-left .form-select {
+/* simple card */
+.card {
+  border-radius: 10px;
+  border: 1px solid rgba(10, 30, 60, 0.06);
+  background: white;
+}
+
+/* dropdown positioning */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 60;
+  min-width: 280px;
+  top: calc(100% + 8px);
+  left: 0;
   border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(11, 17, 32, 0.08);
+  background: white;
 }
 
-/* right panel unchanged from your theme */
-.se-right {
-  width: 52%;
-  padding: 40px 56px;
-  background: #fff;
+/* basic styles */
+.form-check {
   display: flex;
+  gap: 10px;
   align-items: center;
 }
 
-/* domain tiles reuse */
-.domains-grid {
-  display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-  gap: 12px;
+.input.form-control {
+  min-width: 180px;
 }
 
-@media (min-width: 700px) {
-  .domains-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.domain-card {
+/* chips */
+.chips {
   display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chip {
+  background: #eef4ff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: inline-flex;
+  gap: 8px;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+}
+
+.chip-remove {
+  border: 0;
+  background: transparent;
   cursor: pointer;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  font-weight: 800;
+  color: #06307a;
 }
 
-.domain-card.selected {
-  border-color: rgba(34, 197, 94, 0.25);
-  background: linear-gradient(180deg, #f0fff4, #ecfdf5);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 22px rgba(34, 197, 94, 0.06);
+/* teams disabled */
+.disabled-section {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
-/* domain icon container (SVG inserted via v-html) */
-.domain-icon svg {
-  width: 36px;
-  height: 36px;
-}
-
-/* Mattermost status card */
-.status-card {
-  width: 420px;
-  margin-top: 12px;
-  background: #fff;
-  border: 1px solid rgba(11, 42, 102, 0.06);
-  border-radius: 10px;
-  padding: 18px;
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.04);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.status-card.connected {
-  background: linear-gradient(180deg, #f2fff7, #eefdf6);
-  border-color: rgba(5, 150, 105, 0.14);
-}
-
-/* status icon */
-.status-icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f6fbff;
-  flex-shrink: 0;
-}
-
-/* minor text classes */
-.status-title {
-  font-weight: 600;
-  color: #0b1220;
-}
-
-.status-sub {
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-/* override .se-left-title when used in org-left for contrast */
-.org-left .se-left-title {
-  font-size: 22px;
-  margin-bottom: 6px;
-}
-
-/* smaller responsive tweaks */
-@media (max-width: 991.98px) {
-  .se-card {
-    flex-direction: column;
-  }
-
-  .org-left {
-    width: 100%;
-    display: block;
-    min-height: auto;
-    padding: 20px;
-  }
-
-  .se-right {
-    width: 100%;
-    padding: 24px;
+/* small responsive */
+@media (max-width: 700px) {
+  .dropdown-menu {
+    min-width: 220px;
   }
 }
 </style>
