@@ -355,7 +355,7 @@ export default defineComponent({
         if (Array.isArray(parsed) && parsed.length) locations.value = parsed;
         else locations.value = ["New York", "London", "Bengaluru", "Sydney"];
       } catch {
-        locations.value = ["New York", "London", "Bengaluru", "Sydney"];
+        locations.value = ["New York", "London", "Bengaluru", "Sydney", "Australia", "India", "Singapore", "Thailand"];
       }
     }
 
