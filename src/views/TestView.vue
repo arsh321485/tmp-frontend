@@ -717,7 +717,7 @@ export default defineComponent({
   padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid rgba(11, 17, 32, 0.04);
-  background: white;
+  /* background: white; */
   cursor: pointer;
   font-weight: 700;
 }

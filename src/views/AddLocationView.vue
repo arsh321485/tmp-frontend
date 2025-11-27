@@ -10,8 +10,6 @@
             <small class="muted">Manage locations & teams</small>
           </div>
         </div>
-
-
       </header>
 
       <section class="card">
@@ -27,7 +25,8 @@
             <!-- MULTI-SELECT DROPDOWN -->
             <div class="row input-row" ref="multiWrapRef">
               <div class="multi-col">
-                <button class="multi-trigger" @click="toggleDropdown" :aria-expanded="dropdownOpen">
+                <button class="multi-trigger" @click="toggleDropdown" :aria-expanded="dropdownOpen"
+                  ref="multiTriggerRef">
                   <template v-if="selectedPresets.length">
                     <span class="multi-count">{{ selectedPresets.length }}</span>
                     <span class="multi-label">selected</span>
@@ -40,28 +39,32 @@
                   </svg>
                 </button>
 
-                <div v-if="dropdownOpen" class="multi-dropdown" @click.stop>
-                  <div class="multi-actions">
-                    <input class="input" v-model.trim="dropdownCustom"
-                      placeholder="Add custom (single or comma-separated)" @keydown.enter.prevent="addFromDropdown" />
-                    <button class="btn btn-success small" @click="addFromDropdown" :disabled="addingSelected">
-                      <span v-if="addingSelected" class="spinner small" aria-hidden="true"></span>
-                      Add selected
-                    </button>
-                  </div>
+                <!-- TELEPORT: dropdown rendered into <body> to avoid clipping -->
+                <teleport to="body">
+                  <div v-if="dropdownOpen" class="multi-dropdown portal-dropdown" :style="dropdownStyle" @click.stop
+                    role="dialog" aria-modal="false">
+                    <div class="multi-actions">
+                      <input class="input" v-model.trim="dropdownCustom"
+                        placeholder="Add custom (single or comma-separated)" @keydown.enter.prevent="addFromDropdown" />
+                      <button class="btn btn-success small" @click="addFromDropdown" :disabled="addingSelected">
+                        <span v-if="addingSelected" class="spinner small" aria-hidden="true"></span>
+                        Add selected
+                      </button>
+                    </div>
 
-                  <div class="preset-list" role="listbox">
-                    <label class="preset-row" v-for="preset in presets" :key="preset">
-                      <input type="checkbox" :value="preset" v-model="selectedPresets" />
-                      <span class="preset-name">{{ preset }}</span>
-                    </label>
-                  </div>
+                    <div class="preset-list" role="listbox">
+                      <label class="preset-row" v-for="preset in presets" :key="preset">
+                        <input type="checkbox" :value="preset" v-model="selectedPresets" />
+                        <span class="preset-name">{{ preset }}</span>
+                      </label>
+                    </div>
 
-                  <div class="dropdown-foot">
-                    <button class="btn btn-ghost small" @click="clearSelection">Clear</button>
-                    <!-- <button class="btn small" @click="closeDropdown">Done</button> -->
+                    <div class="dropdown-foot">
+                      <button class="btn btn-ghost small" @click="clearSelection">Clear</button>
+                    </div>
                   </div>
-                </div>
+                </teleport>
+                <!-- /TELEPORT -->
               </div>
 
               <div class="info-col muted">Select multiple presets or type customs in dropdown</div>
@@ -80,8 +83,8 @@
 
           </div>
 
-          <!-- <hr class="separator" /> -->
-          <section class="card  table-card p-4" :class="{ 'disabled-section': !teamsEnabled }">
+          <!-- Configure Your Teams -->
+          <section class="card   p-4" :class="{ 'disabled-section': !teamsEnabled }">
             <div class="section-head ">
 
               <div class="d-flex justify-content-between ">
@@ -91,12 +94,9 @@
                     <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" />
                   </svg>
                 </button>
-
               </div>
 
-
               <p class="muted">Add members to the team .</p>
-
 
               <!-- tabs -->
               <nav class="tabs" role="tablist" aria-label="Team tabs">
@@ -121,7 +121,7 @@
                         <th>Assign member</th>
                         <th>Backup member</th>
                         <th>Location</th>
-                        <th></th>
+                        <th>Reset</th>
                       </tr>
                     </thead>
 
@@ -156,7 +156,6 @@
                           </div>
                         </td>
 
-
                         <!-- Backup -->
                         <td>
                           <select class="select" v-model="row.backup" aria-label="backup">
@@ -173,7 +172,7 @@
                           </select>
                         </td>
 
-                        <td class="actions-col">
+                        <td class="">
                           <button class="btn btn-danger outline" @click="clearTeamRow(activeTab, rIdx)"
                             title="Clear row">
                             Clear
@@ -202,8 +201,6 @@
                 title="Go to Threat Profile">
                 Go to Threat Profile
               </button>
-
-
             </div>
           </section>
         </div>
@@ -213,7 +210,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, onBeforeUnmount } from "vue";
+import { defineComponent, ref, onMounted, computed, onBeforeUnmount, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import type { Ref } from "vue";
 
@@ -251,6 +248,13 @@ export default defineComponent({
     const dropdownCustom = ref<string>("");
     const dropdownOpen = ref(false);
     const addingSelected = ref(false);
+
+    // Dropdown positioning (teleported)
+    const dropdownStyle = ref<Record<string, string>>({});
+
+    // Refs to measure the trigger
+    const multiWrapRef: Ref<HTMLElement | null> = ref(null);
+    const multiTriggerRef: Ref<HTMLElement | null> = ref(null);
 
     // Tabs & teams
     const teamTabs = ref([
@@ -350,17 +354,11 @@ export default defineComponent({
     // CTA flag shown after save
     const showThreatCTA = ref(false);
 
-    // --- NEW: teamsEnabled computed (true when we have at least one location) ---
+    // teamsEnabled computed (true when we have at least one location)
     const teamsEnabled = computed(() => locations.value.length > 0);
-    // -------------------------------------------------------------------------
 
     // load locations
-    // ---------- replace your existing loadFromStorage() and onMounted() ----------
-
     function loadFromStorage() {
-      // Try to load saved locations (used when you intentionally want to restore).
-      // But this function will not be used to auto-populate on refresh because
-      // we explicitly clear the stored key in onMounted() below.
       try {
         const raw = localStorage.getItem("tmp_locations_v2");
         if (raw === null) {
@@ -375,50 +373,91 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      // FORCE-CLEAR saved locations on every page load/refresh/login:
-      // removeItem ensures any previously saved locations are removed.
-      // This makes the UI start with an empty locations list every time the page mounts.
       try {
         localStorage.removeItem("tmp_locations_v2");
-      } catch {
-        // ignore storage errors
-      }
-
-      // Now load (this will set locations.value = [] since key is removed)
+      } catch { }
       loadFromStorage();
-
-      // existing click-outside handler for dropdown
-      document.addEventListener("click", handleDocClick);
+      document.addEventListener("click", handleDocClick, true); // capture phase to reliably detect outside clicks
+      window.addEventListener("resize", repositionDropdown);
+      window.addEventListener("scroll", repositionDropdown, true);
     });
-
 
     onBeforeUnmount(() => {
-      document.removeEventListener("click", handleDocClick);
+      document.removeEventListener("click", handleDocClick, true);
+      window.removeEventListener("resize", repositionDropdown);
+      window.removeEventListener("scroll", repositionDropdown, true);
     });
 
-    // click outside dropdown -> close
-    const multiWrapRef: Ref<HTMLElement | null> = ref(null);
+    // click outside dropdown -> close (works with teleported dropdown)
     function handleDocClick(e: MouseEvent) {
-      const wrap = multiWrapRef.value;
-      if (!wrap) return;
       const target = e.target as Node;
-      if (wrap.contains(target)) return;
+      const wrap = multiWrapRef.value;
+      if (wrap && wrap.contains(target)) return; // click inside original wrapper
+      const portal = document.querySelector<HTMLElement>(".portal-dropdown");
+      if (portal && portal.contains(target)) return; // click inside teleported dropdown
+      // else clicked outside both: close
       dropdownOpen.value = false;
     }
 
-    // toggle dropdown
-    function toggleDropdown() {
+    // reposition helper
+    function repositionDropdown() {
+      if (!dropdownOpen.value) return;
+      // recompute coords
+      computeDropdownPosition();
+    }
+
+    async function toggleDropdown() {
       dropdownOpen.value = !dropdownOpen.value;
+
       if (dropdownOpen.value) {
-        setTimeout(() => {
-          const el = multiWrapRef.value?.querySelector<HTMLInputElement>(".multi-dropdown .input");
-          el?.focus();
-        }, 50);
+        await nextTick();
+        computeDropdownPosition();
+        // focus input inside teleported dropdown after it is rendered
+        await nextTick();
+        const portalInput = document.querySelector<HTMLInputElement>(".portal-dropdown .input");
+        portalInput?.focus();
+      } else {
+        dropdownStyle.value = {};
       }
     }
 
     function closeDropdown() {
       dropdownOpen.value = false;
+      dropdownStyle.value = {};
+    }
+
+    function computeDropdownPosition() {
+      const trigger = multiTriggerRef.value ?? multiWrapRef.value?.querySelector<HTMLElement>(".multi-trigger");
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      const scrollY = window.scrollY || window.pageYOffset;
+      const scrollX = window.scrollX || window.pageXOffset;
+
+      // Default width for dropdown - you can tweak; keep it bounded to viewport
+      const preferredWidth = 380;
+      const maxWidth = Math.min(preferredWidth, document.documentElement.clientWidth - 24);
+
+      // Position below the trigger. If there's not enough space at bottom, place above.
+      const gap = 8;
+      const dropdownHeightEstimate = 280; // rough estimate; OK for positioning
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const placeAbove = spaceBelow < dropdownHeightEstimate && rect.top > dropdownHeightEstimate;
+
+      const top = placeAbove ? rect.top + scrollY - dropdownHeightEstimate - gap : rect.bottom + scrollY + gap;
+
+      // ensure the dropdown doesn't overflow to the right
+      let left = rect.left + scrollX;
+      if (left + maxWidth > window.innerWidth + scrollX - 12) {
+        left = Math.max(12 + scrollX, window.innerWidth + scrollX - maxWidth - 12);
+      }
+
+      dropdownStyle.value = {
+        position: "absolute",
+        top: `${top}px`,
+        left: `${left}px`,
+        width: `${maxWidth}px`,
+        zIndex: "200000",
+      };
     }
 
     function clearSelection() {
@@ -600,7 +639,9 @@ export default defineComponent({
       clearSelection,
       closeDropdown,
       multiWrapRef,
+      multiTriggerRef,
       addingSelected,
+      dropdownStyle,
       // teams
       teamTabs,
       activeTab,
@@ -622,7 +663,7 @@ export default defineComponent({
       // CTA
       showThreatCTA,
       goToThreatProfile,
-      // --- NEW: expose teamsEnabled to template ---
+      // teamsEnabled
       teamsEnabled
     };
   }
@@ -630,33 +671,37 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* full CSS styling (keeps the polished look) */
+/* ---------- Styles (kept polished) ---------- */
 .locations-teams-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f6f8fb 0%, #eef5fb 100%);
-  padding: 40px 18px;
+  background: linear-gradient(180deg, #f6f9fc 0%, #eef6ff 100%);
+  padding: 48px 20px;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  color: #0b1220;
+  color: #081226;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* container */
 .container.shell {
-  max-width: 1100px;
+  max-width: 1180px;
   margin: 0 auto;
   position: relative;
 }
 
-/* topbar simplified */
+/* topbar */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .brand-mark {
@@ -669,52 +714,174 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  box-shadow: 0 10px 30px rgba(11, 59, 209, 0.12);
+  box-shadow: 0 8px 26px rgba(11, 59, 209, 0.12);
   font-family: Inter, sans-serif;
 }
 
 .brand-text h1 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: #06307a;
   font-weight: 800;
+  letter-spacing: -0.2px;
 }
 
 .muted {
   color: #6b7280;
+  font-size: 0.92rem;
+}
+
+/* outer card - neutral container */
+.card {
+  background: transparent;
+  border-radius: 14px;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+}
+
+/* CARD-INNER: stacked layout - one column so boxes are up & down */
+.card-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  /* single column = stacked */
+  gap: 20px;
+  padding: 6px;
+}
+
+/* each box becomes a full-width card */
+.card-inner>.section,
+.card-inner>section.card.p-4 {
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  border-radius: 14px;
+  padding: 22px;
+  border: 1px solid rgba(11, 17, 32, 0.06);
+  box-shadow: 0 12px 40px rgba(9, 30, 66, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+/* subtle hover lift for desktop */
+.card-inner>.section:hover,
+.card-inner>section.card.p-4:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 60px rgba(9, 30, 66, 0.08);
+}
+
+/* make headings clearer inside each box */
+.section-head h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  color: #08204b;
+  letter-spacing: -0.2px;
+  font-weight: 700;
+}
+
+.section-head .muted {
+  margin: 0;
   font-size: 0.9rem;
 }
 
-/* actions */
-.section .actions,
-.card>.actions {
+/* layout inside the boxes: keep spacing tidy */
+.row.input-row {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  position: relative;
+  flex-wrap: wrap;
 }
 
-/* disabled section styling (blocks interaction and dims) */
-.disabled-section {
-  opacity: 0.5;
-  pointer-events: none;
-  user-select: none;
+/* Multi-select refined */
+.multi-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 17, 32, 0.06);
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  cursor: pointer;
+  font-weight: 800;
+  min-width: 240px;
+  justify-content: space-between;
+  color: #053070;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+  box-shadow: 0 6px 18px rgba(8, 24, 56, 0.04);
 }
 
-/* make sure topbar .actions isn't affected (topbar already handles layout) */
-.topbar .actions {
-  justify-content: flex-end;
+.multi-trigger:focus,
+.multi-trigger:hover {
+  box-shadow: 0 10px 28px rgba(8, 24, 56, 0.06);
+  transform: translateY(-1px);
 }
 
-/* smaller screens: keep buttons right-aligned but not overflowing */
-@media (max-width: 575px) {
+.multi-count {
+  background: #eef4ff;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #0b3ba6;
+  font-weight: 900;
+  font-size: 0.9rem;
+}
 
-  .section .actions,
-  .card>.actions {
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
+.caret {
+  width: 14px;
+  height: 14px;
+  opacity: 0.8;
+}
+
+/* dropdown (teleported) */
+.multi-dropdown {
+  position: absolute;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid rgba(11, 17, 32, 0.06);
+  box-shadow: 0 22px 48px rgba(11, 17, 32, 0.12);
+  padding: 12px;
+  z-index: 200000;
+  max-height: 400px;
+  overflow: hidden;
+}
+
+/* small extra class that identifies teleported dropdown */
+.portal-dropdown {
+  overflow: auto;
+}
+
+/* animations */
+@keyframes popIn {
+  from {
+    transform: translateY(-6px) scale(.995);
+    opacity: 0;
   }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* internal dropdown layout */
+.multi-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.multi-actions .input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(11, 17, 32, 0.06);
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  font-weight: 700;
+  transition: box-shadow .12s;
+}
+
+.multi-actions .input:focus {
+  box-shadow: 0 8px 20px rgba(3, 19, 77, 0.06);
+  outline: none;
 }
 
 .btn {
@@ -724,16 +891,31 @@ export default defineComponent({
   padding: 8px 12px;
   border-radius: 10px;
   border: 1px solid rgba(11, 17, 32, 0.04);
-  background: white;
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+/* small variant */
+.btn.small {
+  padding: 7px 10px;
+  font-size: 0.87rem;
+  border-radius: 9px;
+}
+
+/* success / primary */
+.btn-success {
+  background: linear-gradient(180deg, #00a86b, #008a56);
+  color: white;
+  border: none;
+  box-shadow: 0 10px 28px rgba(0, 168, 107, 0.12);
 }
 
 .btn-primary {
   background: linear-gradient(180deg, #0b3ba6, #0554c9);
   color: white;
   border: none;
-  box-shadow: 0 8px 24px rgba(3, 19, 77, 0.08);
+  box-shadow: 0 10px 28px rgba(6, 29, 99, 0.10);
 }
 
 .btn-ghost {
@@ -742,219 +924,93 @@ export default defineComponent({
   border: 1px solid rgba(11, 17, 32, 0.04);
 }
 
-.btn-success {
-  background: linear-gradient(180deg, #00a86b, #008a56);
-  color: white;
-  border: none;
-}
-
-.btn.small {
-  padding: 6px 10px;
-  font-size: 0.9rem;
-  border-radius: 8px;
-}
-
-/* add-button style */
-.btn-add {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, #ff6b6b, #e84040);
-  color: white;
-  border: none;
-  box-shadow: 0 10px 30px rgba(232, 64, 64, 0.12);
-  cursor: pointer;
-}
-
-.add-icon {
-  width: 18px;
-  height: 18px;
-}
-
-/* card */
-.card {
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 20px 60px rgba(11, 17, 32, 0.06);
-  overflow: hidden;
-  border: 1px solid rgba(11, 17, 32, 0.04);
-}
-
-.card-inner {
-  padding: 22px;
-
-}
-
-.table-card {
-  border: 5px solid rgba(4, 5, 7, 0.04);
-  box-shadow: 0 20px 60px rgba(4, 5, 7, 0.04);
-  ;
-}
-
-/* layout for inputs */
-.row.input-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 8px;
-  position: relative;
-}
-
-.multi-col {
-  position: relative;
-}
-
-/* multi trigger */
-.multi-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(11, 17, 32, 0.06);
-  background: linear-gradient(180deg, #fff, #fbfdff);
-  cursor: pointer;
-  font-weight: 700;
-  min-width: 220px;
-  justify-content: space-between;
-}
-
-.multi-count {
-  background: #eef4ff;
-  padding: 4px 8px;
-  border-radius: 999px;
-  color: #0b3ba6;
-  font-weight: 800;
-}
-
-.caret {
-  width: 14px;
-  height: 14px;
-  opacity: 0.7;
-}
-
-/* dropdown */
-.multi-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  width: 360px;
-  max-width: calc(100vw - 48px);
-  background: white;
-  border-radius: 12px;
-  border: 1px solid rgba(11, 17, 32, 0.06);
-  box-shadow: 0 18px 48px rgba(11, 17, 32, 0.12);
-  padding: 12px;
-  z-index: 30;
-}
-
-/* dropdown actions */
-.multi-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.multi-actions .input {
-  flex: 1;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(11, 17, 32, 0.06);
-}
-
 /* preset list */
 .preset-list {
-  max-height: 180px;
+  max-height: 240px;
   overflow: auto;
   padding: 6px 2px;
   border-radius: 8px;
+  background: linear-gradient(180deg, rgba(240, 246, 255, 0.6), transparent);
 }
 
 .preset-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
+  transition: background .12s;
 }
 
 .preset-row:hover {
-  background: rgba(2, 6, 23, 0.02);
-}
-
-.preset-row input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-}
-
-/* dropdown footer */
-.dropdown-foot {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 8px;
-}
-
-/* inputs */
-.input,
-.select {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(11, 17, 32, 0.06);
-  background: linear-gradient(180deg, #fff, #fbfdff);
-  font-weight: 600;
-}
-
-.select {
-  max-width: 260px;
-}
-
-/* info column replacing removed add/input */
-.info-col {
-  color: #6b7280;
-  font-weight: 600;
+  background: rgba(8, 32, 80, 0.03);
 }
 
 /* chips */
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  margin-top: 12px;
 }
 
 .chip {
   padding: 8px 12px;
   background: linear-gradient(180deg, #f1f7ff, #fbfdff);
   border-radius: 999px;
-  font-weight: 700;
+  font-weight: 800;
   color: #06307a;
-  box-shadow: 0 8px 24px rgba(3, 19, 77, 0.04);
+  box-shadow: 0 8px 20px rgba(3, 19, 77, 0.04);
   display: inline-flex;
   gap: 8px;
   align-items: center;
+  border: 1px solid rgba(6, 48, 110, 0.04);
+  transition: transform .12s;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
 }
 
 .chip-remove {
-  background: transparent;
+  background: rgba(6, 48, 110, 0.06);
   border: none;
-  font-weight: 800;
-  font-size: 14px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 13px;
   color: #06307a;
   cursor: pointer;
 }
 
-/* rest of beautiful styles retained (table, tabs, fab etc.) */
+/* info column */
+.info-col {
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* messages */
+.msg {
+  margin-top: 12px;
+  font-weight: 800;
+}
+
+.msg.ok {
+  color: #0a8b5f;
+}
+
+.msg.err {
+  color: #d43f3f;
+}
+
+/* Tabs refined */
 .tabs {
   display: flex;
   gap: 8px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .tab {
@@ -965,35 +1021,170 @@ export default defineComponent({
   font-weight: 800;
   cursor: pointer;
   color: #334155;
+  transition: background .12s, transform .12s;
 }
 
 .tab.active {
-  background: linear-gradient(180deg, #fff, #eef6ff);
+  background: linear-gradient(180deg, #ffffff, #eef6ff);
   border: 1px solid rgba(8, 48, 110, 0.08);
   box-shadow: 0 10px 30px rgba(3, 19, 77, 0.06);
   color: #0b3ba6;
+  transform: translateY(-2px);
 }
 
+/* Table polish */
 .table-wrap {
   overflow: auto;
   border-radius: 10px;
+  margin-top: 10px;
 }
 
 table.modern {
   width: 100%;
   border-collapse: collapse;
   min-width: 720px;
+  background: transparent;
+  font-weight: 700;
 }
 
-/* ... rest of styles unchanged ... */
+/* table header */
+table.modern thead th {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  color: #21324a;
+  border-bottom: 1px solid rgba(8, 24, 64, 0.04);
+  background: linear-gradient(180deg, rgba(250, 253, 255, 0.6), transparent);
+}
 
+/* rows */
+table.modern tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px dashed rgba(8, 24, 64, 0.03);
+  vertical-align: middle;
+  color: #0b1220;
+  font-weight: 700;
+}
+
+/* role pill */
+td.role {
+  font-weight: 900;
+  color: #0b3ba6;
+}
+
+/* member control */
+.member-control {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #eef3ff, #e7f0ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #0b3ba6;
+  font-weight: 900;
+  box-shadow: 0 8px 16px rgba(11, 59, 209, 0.06);
+}
+
+/* selects and inputs */
+.input,
+.select {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(11, 17, 32, 0.06);
+  background: linear-gradient(180deg, #fff, #fbfdff);
+  font-weight: 700;
+  color: #062046;
+  min-width: 160px;
+}
+
+.select {
+  max-width: 260px;
+}
+
+/* action buttons row */
+.section .actions,
+.card>.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+/* add button */
+.btn-add {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, #ff6b6b, #e84040);
+  color: white;
+  border: none;
+  box-shadow: 0 12px 30px rgba(232, 64, 64, 0.12);
+  cursor: pointer;
+}
+
+/* disabled section dimming (teams disabled when no locations) */
+.disabled-section {
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* responsive tweaks */
 @media (max-width: 900px) {
-  .table-wrap {
-    overflow: visible;
-  }
-
   table.modern {
     min-width: 640px;
   }
+}
+
+@media (max-width: 575px) {
+  .card-inner {
+    gap: 14px;
+  }
+
+  .multi-trigger {
+    min-width: 180px;
+  }
+
+  .select {
+    min-width: 120px;
+  }
+}
+
+/* small helpers */
+.empty {
+  color: #6b7280;
+  padding: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #fff, #eef6ff);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.06);
+  display: inline-block;
+}
+
+.spinner.small {
+  width: 10px;
+  height: 10px;
+}
+
+/* subtle global transitions */
+* {
+  transition: color .12s ease, background .12s ease, box-shadow .12s ease;
 }
 </style>
