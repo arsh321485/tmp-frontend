@@ -83,8 +83,19 @@
           <hr class="separator" />
           <section class="card p-4" :class="{ 'disabled-section': !teamsEnabled }">
             <div class="section-head ">
-              <h2>Configure Your Teams</h2>
-              <p class="muted">Add members to the team.</p>
+
+              <div class="d-flex justify-content-between">
+                <h2>Configure Your Teams</h2>
+                <button class="btn btn-add" @click="addEmptyRow" title="Add team row">
+                  <svg viewBox="0 0 24 24" class="add-icon" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                </button>
+
+              </div>
+
+
+              <p class="muted">Add members to the team .</p>
 
 
               <!-- tabs -->
@@ -192,11 +203,7 @@
                 Go to Threat Profile
               </button>
 
-              <button class="btn btn-add" @click="addEmptyRow" title="Add team row">
-                <svg viewBox="0 0 24 24" class="add-icon" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </button>
+
             </div>
           </section>
         </div>
