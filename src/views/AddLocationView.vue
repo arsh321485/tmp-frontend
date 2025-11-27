@@ -80,11 +80,11 @@
 
           </div>
 
-          <hr class="separator" />
-          <section class="card p-4" :class="{ 'disabled-section': !teamsEnabled }">
+          <!-- <hr class="separator" /> -->
+          <section class="card  table-card p-4" :class="{ 'disabled-section': !teamsEnabled }">
             <div class="section-head ">
 
-              <div class="d-flex justify-content-between">
+              <div class="d-flex justify-content-between ">
                 <h2>Configure Your Teams</h2>
                 <button class="btn btn-add" @click="addEmptyRow" title="Add team row">
                   <svg viewBox="0 0 24 24" class="add-icon" xmlns="http://www.w3.org/2000/svg">
@@ -785,6 +785,13 @@ export default defineComponent({
 
 .card-inner {
   padding: 22px;
+
+}
+
+.table-card {
+  border: 5px solid rgba(4, 5, 7, 0.04);
+  box-shadow: 0 20px 60px rgba(4, 5, 7, 0.04);
+  ;
 }
 
 /* layout for inputs */
