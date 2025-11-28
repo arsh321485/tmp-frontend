@@ -95,8 +95,10 @@
                   </svg>
                 </button>
               </div>
+              <!-- <p class="muted">Add teams to assign to team members.</p> -->
 
-              <p class="muted">Add members to the team .</p>
+
+
 
               <!-- tabs -->
               <nav class="tabs" role="tablist" aria-label="Team tabs">
