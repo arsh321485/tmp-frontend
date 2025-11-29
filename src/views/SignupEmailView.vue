@@ -29,15 +29,21 @@
                   <small class="text-muted">Complete the details below to create your account</small>
                 </div>
 
+                <!-- ===== CTA Buttons: Slack / Teams / Asana ===== -->
+                <div class="d-flex">
+                  <button class="btn btn-outline-dark btn-sm me-2" type="button" @click="signup('slack')">
+                    <span class="btn-text " style="font-size: smaller;">SignIn with Slack</span>
+                  </button>
+                  <button class="btn btn-outline-dark btn-sm me-2" type="button" @click="signup('teams')">
+                    <span class="btn-text" style="font-size: smaller;">SignIn with Teams</span>
+                  </button>
+                  <button class="btn btn-outline-dark btn-sm" type="button" @click="signup('asana')">
+                    <span class="btn-text" style="font-size: smaller;">SignIn with Asana</span>
+                  </button>
+                </div>
+                <!-- ===== End CTA Buttons ===== -->
+
                 <form @submit.prevent="onSubmit" novalidate :class="{ 'was-validated': tried }">
-                  <!-- Name -->
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold mb-1">Name</label>
-                    <input v-model.trim="form.name"
-                      :class="['form-control', 'form-control-sm', { 'is-invalid': nameError }]" type="text"
-                      placeholder="Full name" required />
-                    <div class="invalid-feedback small">{{ nameError }}</div>
-                  </div>
 
                   <!-- Email -->
                   <div class="mb-3">
@@ -65,23 +71,6 @@
                     </div>
                     <div class="invalid-feedback small">{{ passwordError }}</div>
                     <div class="form-text small text-muted">Use at least 8 characters.</div>
-                  </div>
-
-                  <!-- Confirm Password -->
-                  <div class="mb-3">
-                    <label class="form-label small fw-semibold  mb-1">Confirm Password</label>
-                    <div class="input-group input-group-sm">
-                      <input v-model="form.confirmPassword"
-                        :class="['form-control', 'form-control-sm', { 'is-invalid': confirmError }]"
-                        :type="showPassword ? 'text' : 'password'" placeholder="Re-enter password" required />
-                      <button class="btn btn-sm  btn-icon input-addon" type="button" @click="toggleShowPassword"
-                        :aria-pressed="showPassword" :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                        title="Toggle password visibility">
-                        <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                      </button>
-                      <div class="invalid-feedback small">{{ confirmError }}</div>
-                    </div>
-                    <div class="invalid-feedback small">{{ confirmError }}</div>
                   </div>
 
                   <!-- Submit -->
@@ -114,54 +103,71 @@
 import { defineComponent } from "vue";
 
 interface SignupForm {
-  name: string;
+  // you currently only use email and password in template — keep the other keys if you prefer but they won't block submit
+  name?: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  confirmPassword?: string;
 }
 
-/** Minimal typed shape for router we use (avoid 'any') */
+/** Router-like shape used when calling router.push */
 interface RouterLike {
   push(location: { path: string; query?: Record<string, string> } | string): Promise<void> | void;
+}
+
+/** $route minimal shape we read */
+interface RouteLike {
+  query?: Record<string, string | undefined>;
 }
 
 export default defineComponent({
   name: "SignUpEmailFormThemeA",
   data() {
     return {
+      // only email & password are required here
       form: {
-        name: "",
         email: "",
-        password: "",
-        confirmPassword: ""
+        password: ""
       } as SignupForm,
       tried: false as boolean,
       submitting: false as boolean,
       message: "" as string,
       messageClass: "" as string,
-      nameError: "" as string,
       emailError: "" as string,
       passwordError: "" as string,
-      confirmError: "" as string,
-      showPassword: false as boolean
+      showPassword: false as boolean,
+      // optional: if page was opened with provider query you'll still carry it
+      selectedProvider: "" as string | null
     };
+  },
+  mounted() {
+    // detect provider in URL (keep it so "Create account" can include provider)
+    try {
+      const route = (this as unknown as { $route?: RouteLike }).$route;
+      const provider =
+        (route?.query?.provider as string | undefined) ??
+        (new URLSearchParams(window.location.search).get("provider") ?? undefined);
+
+      if (provider && ["slack", "teams", "asana"].includes(provider)) {
+        this.selectedProvider = provider;
+      }
+    } catch {
+      // ignore
+    }
   },
   methods: {
     toggleShowPassword(): void {
       this.showPassword = !this.showPassword;
     },
 
+    /**
+     * UPDATED validate(): only checks fields present in the template (email + password).
+     * Previously you had name/confirmPassword checks which blocked the submit.
+     */
     validate(): boolean {
-      this.nameError = "";
       this.emailError = "";
       this.passwordError = "";
-      this.confirmError = "";
       let ok = true;
-
-      if (!this.form.name || !this.form.name.trim()) {
-        this.nameError = "Name is required";
-        ok = false;
-      }
 
       if (!this.form.email || !this.form.email.trim()) {
         this.emailError = "Email is required";
@@ -179,14 +185,6 @@ export default defineComponent({
         ok = false;
       }
 
-      if (!this.form.confirmPassword) {
-        this.confirmError = "Please confirm your password";
-        ok = false;
-      } else if (this.form.password !== this.form.confirmPassword) {
-        this.confirmError = "Passwords do not match";
-        ok = false;
-      }
-
       return ok;
     },
 
@@ -199,36 +197,26 @@ export default defineComponent({
 
       this.submitting = true;
       try {
-        // simulate network delay
-        await new Promise((r) => setTimeout(r, 800));
-
-        this.message = "Account created — check your email for verification.";
-        this.messageClass = "text-success";
-
+        // navigate to /onboarding with ?email=... and include provider if present
         const emailToSend = this.form.email.trim();
-
-        // clear sensitive fields
-        this.form.password = "";
-        this.form.confirmPassword = "";
-        this.tried = false;
-        this.showPassword = false;
-
-        // navigate to next step (email onboarding)
-        const target = { path: "/email-onboarding", query: { email: emailToSend } };
+        const query: Record<string, string> = {};
+        if (emailToSend) query.email = emailToSend;
+        if (this.selectedProvider) query.provider = this.selectedProvider;
 
         const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
         if (maybeRouter && typeof maybeRouter.push === "function") {
-          // prefer named/clean client-side navigation
-          await maybeRouter.push(target);
-        } else {
-          // fallback (full page navigate) — preserve query param
-          window.location.href = `/email-onboarding?email=${encodeURIComponent(emailToSend)}`;
+          await maybeRouter.push({ path: "/onboarding", query });
+          return;
         }
+
+        const url = new URL(window.location.origin + "/onboarding");
+        Object.entries(query).forEach(([k, v]) => url.searchParams.set(k, v));
+        window.location.href = url.toString();
       } catch (err: unknown) {
         if (err instanceof Error) {
-          this.message = err.message || "Unable to create account. Try again.";
+          this.message = err.message || "Unable to continue to onboarding. Try again.";
         } else {
-          this.message = "Unable to create account. Try again.";
+          this.message = "Unable to continue to onboarding. Try again.";
         }
         this.messageClass = "text-danger";
       } finally {
@@ -240,16 +228,33 @@ export default defineComponent({
       const maybeRouter = (this as unknown as { $router?: RouterLike }).$router;
       if (maybeRouter && typeof maybeRouter.push === "function") {
         void maybeRouter.push({ path: "/login" });
-      } else {
-        window.location.href = "/login";
+        return;
       }
+      window.location.href = "/login";
+    },
+
+    /**
+     * signup(provider) — immediate navigation to onboarding?provider=...
+     */
+    signup(this: { $router?: RouterLike }, provider: string) {
+      const router = (this as unknown as { $router?: RouterLike }).$router;
+      const target = { path: "/onboarding", query: { provider } };
+
+      if (router && typeof router.push === "function") {
+        void router.push(target);
+        return;
+      }
+
+      window.location.href = `/onboarding?provider=${encodeURIComponent(provider)}`;
     }
   }
 });
 </script>
 
+
+
 <style scoped>
-/* Match visual style & sizing from the providers page */
+/* Match visual style & sizing from the providers page (unchanged UI) */
 
 /* page background */
 .split-signup {
@@ -344,14 +349,10 @@ export default defineComponent({
   padding-bottom: 18px;
 }
 
-/* Titles & small text styling */
-.title {
-  color: #03318d;
-  font-weight: 700;
-}
-
-.text-muted {
-  color: #6b7280 !important;
+/* CTA buttons style (kept visually same) */
+.d-flex .btn {
+  height: 36px;
+  padding: 6px 10px;
 }
 
 /* form control appearance consistent with provider page */
@@ -360,7 +361,6 @@ export default defineComponent({
   padding: 0.44rem 0.6rem;
   border-radius: 8px;
   border: 1px solid #e6e9ec;
-  /* make right edge flush when input-group used */
 }
 
 /* ensure input sits nicely next to the eye button */
@@ -382,23 +382,9 @@ export default defineComponent({
   background: #fff;
   color: #6b7280;
   height: calc(1.5em + 1rem);
-  /* aligns with .form-control-sm height */
   line-height: 1;
 }
 
-/* small variant styling to match input-group-sm */
-.input-group-sm>.input-addon,
-.input-group-sm>.form-control {
-  height: calc(1.5em + 0.625rem);
-}
-
-/* remove extra focus outline on the button (keep accessibility via aria) */
-.input-addon:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-/* dark primary button like provider page */
 .btn-dark {
   background: #03318d;
   border: none;
@@ -407,17 +393,10 @@ export default defineComponent({
   padding: 10px 14px;
 }
 
-/* invalid feedback */
 .invalid-feedback.small {
   font-size: 0.82rem;
 }
 
-/* make sure icon/button spacing looks right */
-.input-group .btn-icon {
-  border-left: 1px solid #e6e9ec;
-}
-
-/* Responsive: hide left artwork on narrower screens */
 @media (max-width: 991.98px) {
   .card-shell {
     flex-direction: column;
@@ -442,7 +421,6 @@ export default defineComponent({
   }
 }
 
-/* Very large screens: cap width so card doesn't become extremely wide */
 @media (min-width: 1600px) {
   .card-shell {
     max-width: 1200px;

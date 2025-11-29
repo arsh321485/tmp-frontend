@@ -106,10 +106,10 @@ export default defineComponent({
     signup(this: { $router?: Router }, provider: string) {
       const router = this.$router;
       if (router) {
-        router.push({ path: "/test", query: { provider } });
+        router.push({ path: "/onboarding", query: { provider } });
         return;
       }
-      window.location.href = `/test?provider=${provider}`;
+      window.location.href = `/onbording?provider=${provider}`;
     },
 
     // same pattern for goToSignin
